@@ -19,6 +19,9 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    V0.2.0 / jph
+    - enh github#1 sample loop points
 */
 
 
@@ -54,6 +57,10 @@ struct _Sample
     int raw_samplerate; /* if the sample was a regular sound file ie */
     int raw_channels;   /* with a header, then these fields will be  */
     int sndfile_format; /* zero. if raw, they will be non-zero       */
+
+    int loop_start;		/* info present in the sample */
+    int loop_end;
+    bool loop_valid;	// jph github#1
 
     char*   filename;
 

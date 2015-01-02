@@ -20,7 +20,12 @@
     along with Phin.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a PHAT original, modified 2011
+
+    V0.2.0 / jph
+    - bug github#2 : display of value of sliders in tooltip
 */
+
+
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <math.h>
@@ -151,6 +156,25 @@ static void phin_slider_adjustment_value_changed(GtkAdjustment*,
 
 
 /**
+ * phin_slider_value_in_tooltip:
+ * @slider: slider to be updated
+ * @value: value to be displayed in the tooltip
+ * @unit: unit of the value
+ * @prec: precision
+ *
+ * Displays the value of the slider in the tootip - jph github#2
+ */
+void phin_slider_value_in_tooltip (GtkWidget* slider, float value, char* unit, char prec)
+{
+
+	char strvalue[10];
+
+	sprintf( strvalue, "%5.*f%s", prec, value, unit);
+    gtk_widget_set_tooltip_text( slider, strvalue);
+}
+
+
+/**
  * phin_slider_set_value:
  * @slider: a #PhinSlider
  * @value: a new value for the slider
@@ -172,16 +196,16 @@ void phin_slider_set_value (PhinSlider* slider, double value)
 
     gtk_adjustment_set_value (p->adjustment, value);
 
-    if(p->is_log)
-    {
-        gtk_adjustment_set_value(GTK_ADJUSTMENT(p->adjustment_prv),
-                            log(value - lower) / log(upper - lower));
-    }
-    else
-    {
+    //if(p->is_log) // jph github#2
+    //{
+    //    gtk_adjustment_set_value(GTK_ADJUSTMENT(p->adjustment_prv),
+    //                        log(value - lower) / log(upper - lower));
+   // }
+    //else
+    //{
         gtk_adjustment_set_value(GTK_ADJUSTMENT(p->adjustment_prv),
                             (value - lower) / (upper - lower));
-    }
+    //}
 }
 
 
@@ -216,14 +240,19 @@ double phin_slider_get_value (PhinSlider* slider)
     gdouble upper = gtk_adjustment_get_upper(p->adjustment);
     gdouble value = 0;
     gdouble prv_value = gtk_adjustment_get_value(p->adjustment_prv);
+    gdouble scale = upper - lower;
 
-    if(p->is_log)
-    {   /* FIXME: log scale */
-        value = exp(prv_value * log(upper - lower)) + lower;
+    /* log slider */
+    if(p->is_log)	// jph github#2
+    {
+        value = (pow( 1000, prv_value) - 1) * scale/1000;
+        if ( value < 0 )
+        	value = 0;
     }
+    /* lin slider */
     else
     {
-        value = prv_value * (upper - lower) + lower;
+        value = prv_value * scale + lower;
     }
 
     /* not sure what the purpose of this set value call is:
@@ -517,7 +546,7 @@ static void phin_slider_init (PhinSlider* slider)
     p->arrow_cursor = NULL;
     p->empty_cursor = NULL;
     p->event_window = NULL;
-    p->is_log = 0;
+    p->is_log = FALSE;
     p->use_default_value = FALSE;
 
     g_signal_connect (p->adjustment_prv, "changed",
@@ -1330,6 +1359,7 @@ static void phin_slider_adjustment_value_changed (GtkAdjustment* adj,
     PhinSliderPrivate* p = PHIN_SLIDER_GET_PRIVATE (slider);
     GtkWidget* widget;
     double adj_lower, adj_upper, adj_value;
+    gdouble value = 0;
 
     g_return_if_fail (PHIN_IS_SLIDER (slider));
 
@@ -1338,7 +1368,17 @@ static void phin_slider_adjustment_value_changed (GtkAdjustment* adj,
     adj_upper = gtk_adjustment_get_upper(adj);
     adj_value = gtk_adjustment_get_value(adj);
 
-    p->val = ((adj_value - adj_lower) / (adj_upper - adj_lower));
+    /* log slider */
+    if(p->is_log)	// jph github#2
+    {
+    	fqlksjfh
+    }
+    /* lin slider */
+    else
+    {
+        value = ((adj_value - adj_lower) / (adj_upper - adj_lower));
+    }
+    p->val = value;
 
     gtk_widget_queue_draw (widget);
 

@@ -19,6 +19,9 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    V0.2.0 / jph
+    - enh github#1 sample loop points
 */
 
 
@@ -325,6 +328,32 @@ int sample_get_resampled_size(const char* name, int rate,
 }
 
 
+/*
+ *	get loop informations from sample data - jph github#1
+ */
+static bool sample_get_loop_info( SNDFILE *sndfile, unsigned int *start, unsigned int *end)
+{
+
+	SF_INSTRUMENT inst;
+	bool result = false;
+
+
+	sf_command( sndfile, SFC_GET_INSTRUMENT, &inst, sizeof (inst));
+	/* check existence of a loop */
+	if ( inst.loop_count == 1 )
+	{
+		if ( (inst.loops[0].mode >= 800) && (inst.loops[0].mode <= 809) &&
+			 (inst.loops[0].start <  inst.loops[0].end) )
+		{
+			*start = inst.loops[0].start;
+			*end = inst.loops[0].end;
+			result = true;
+		}
+	}
+	return result;
+}
+
+
 int sample_load_file(Sample* sample, const char* name,
                                         int rate,
                                         int raw_samplerate,
@@ -335,6 +364,13 @@ int sample_load_file(Sample* sample, const char* name,
     float* tmp;
     SF_INFO sfinfo;
     SNDFILE* sfp;
+    unsigned int lstart;	// jph github#1
+    unsigned int lend;
+    bool sf_loop_ret;
+    int size_o;
+    int size_r;
+    double ratio;
+
 
     if (!(sfp = open_sample(&sfinfo, name,  raw_samplerate,
                                             raw_channels,
@@ -345,6 +381,9 @@ int sample_load_file(Sample* sample, const char* name,
 
     if (!(tmp = read_audio(sfp, &sfinfo)))
         return -1;
+
+    /* get loop points - jph github#1 */
+    sf_loop_ret = sample_get_loop_info( sfp, &lstart, &lend);
 
     sf_close(sfp);
 
@@ -366,6 +405,8 @@ int sample_load_file(Sample* sample, const char* name,
             JACK is not running, useful under debug conditions. */
         if (rate > 0 && sfinfo.samplerate != rate)
         {
+        	size_o = sfinfo.frames;	// jph github#1
+
             float* tmp2 = resample(tmp, rate, &sfinfo);
 
             if (!tmp2)
@@ -376,6 +417,15 @@ int sample_load_file(Sample* sample, const char* name,
 
             free(tmp);
             tmp = tmp2;
+
+            /* modify loop points according to the new length - jph github#1 */
+            if ( sf_loop_ret )
+            {
+				size_r = sfinfo.frames;
+				ratio = size_r/(size_o * 1.0);
+				lstart = lstart * ratio;
+				lend = lend * ratio;
+            }
         }
     }
 
@@ -402,6 +452,21 @@ int sample_load_file(Sample* sample, const char* name,
     sample->frames = sfinfo.frames;
 
     sample->default_sample = false;
+	
+    if ( sf_loop_ret )	// jph github#1
+    {
+    	if ( lstart > (unsigned int) sample->frames )
+    		lstart = sample->frames;
+    	if ( lend > (unsigned int) sample->frames )
+    		lend = sample->frames;
+   		sample->loop_start = lstart;
+   		sample->loop_end = lend;
+   		sample->loop_valid = true;
+    }
+    else
+    {
+   		sample->loop_valid = false;
+    }
 
     return 0;
 }
@@ -436,6 +501,7 @@ int sample_deep_copy(Sample* dest, const Sample* src)
     return 0;
 }
 
+
 bool is_valid_file(const char* path)
 {
     struct stat st_buf;
@@ -445,3 +511,4 @@ bool is_valid_file(const char* path)
 
     return (S_ISREG(st_buf.st_mode)  || S_ISLNK(st_buf.st_mode));
 }
+

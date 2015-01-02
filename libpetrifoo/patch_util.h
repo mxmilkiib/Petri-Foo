@@ -19,6 +19,9 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    V0.2.0 / jph
+    - enh github#1 sample loop points
 */
 
 
@@ -50,7 +53,8 @@ const char* patch_strerror        (int error);
 int         patch_sample_load     (int id, const char* file,
             /* 0 for non-raw data */    int raw_samplerate,
             /* 0 for non-raw data */    int raw_channels,
-            /* 0 for non-raw data */    int sndfile_format);
+            /* 0 for non-raw data */    int sndfile_format,
+            							bool sampleinfo);	// jph github#1
 
 int         patch_sample_load_from(int dest_id, int src_id);
 

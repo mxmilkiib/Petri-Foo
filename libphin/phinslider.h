@@ -21,26 +21,7 @@
 
     This file is a derivative of a PHAT original, modified 2011
 */
-/*  Phin is a fork of PHAT
 
-    Original Specimen author Pete Bessman
-    Copyright 2005 Pete Bessman
-    Copyright 2011 James W. Morris
-
-    This file is part of Phin
-
-    Phin is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License version 2 as
-    published by the Free Software Foundation.
-
-    Phin is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Phin.  If not, see <http://www.gnu.org/licenses/>.
-*/
 
 #ifndef __PHIN_SLIDER_H__
 #define __PHIN_SLIDER_H__
@@ -83,6 +64,8 @@ struct _PhinSliderClass
     void (*changed)       (PhinSlider* slider);
 };
 
+
+void phin_slider_value_in_tooltip (GtkWidget* slider, float value, char* unit, char prec); // jph github#2
 
 GType       phin_slider_get_type(   void );
 void        phin_slider_set_value(  PhinSlider*, double );

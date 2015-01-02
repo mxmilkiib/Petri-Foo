@@ -15,6 +15,9 @@
 
     You should have received a copy of the GNU General Public License
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
+
+    V0.2.0 / jph
+    - enh github#1 sample loop points
 */
 
 
@@ -946,7 +949,8 @@ static int dish_file_read_sample(xmlNodePtr node,  int patch_id)
             if (patch_sample_load(patch_id, filename,
                                             raw_samplerate,
                                             raw_channels,
-                                            sndfile_format) < 0)
+                                            sndfile_format,
+                                            false) < 0)	// jph github#1
             {
                 msg_log(MSG_ERROR, "failed to load sample: %s error (%s)\n",
                     filename, pf_error_str(pf_error_get()));

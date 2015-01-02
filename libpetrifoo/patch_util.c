@@ -19,6 +19,9 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    V0.2.0 / jph
+    - enh github#1 sample loop points
 */
 
 
@@ -257,7 +260,7 @@ int patch_create_default(void)
 
     patch_unlock(id);
 
-    patch_sample_load(id, "Default", 0, 0, 0);
+    patch_sample_load(id, "Default", 0, 0, 0, false);	// jph github#1
     p->lower_note = 36;
     p->upper_note = 83;
     p->lower_vel  = 0;
@@ -433,7 +436,8 @@ void patch_flush_all ( )
 int patch_sample_load(int id, const char *name,
                                     int raw_samplerate,
                                     int raw_channels,
-                                    int sndfile_format)
+                                    int sndfile_format,
+                                    bool sampleinfo)	// jph github#1
 {
     int val;
     double ratio = (patch_samplerate == 44100)
@@ -482,11 +486,22 @@ int patch_sample_load(int id, const char *name,
     }
     else
     {
-        patches[id]->fade_samples = (frames / 2 > 100) ? 100 * ratio : 0;
-        patches[id]->xfade_samples = (frames / 2 > 100) ? 100 * ratio : 0;
-        patches[id]->loop_start = patches[id]->xfade_samples;
-        patches[id]->loop_stop = patches[id]->sample_stop -
+    	/* read loop info from the sample file - jph github#1 */
+    	if ( sampleinfo && patches[id]->sample->loop_valid)
+    	{
+			patches[id]->fade_samples = 0;
+			patches[id]->xfade_samples = 0;
+			patches[id]->loop_start = patches[id]->sample->loop_start;
+			patches[id]->loop_stop = patches[id]->sample->loop_end;
+    	}
+    	else
+    	{
+        	patches[id]->fade_samples = (frames / 2 > 100) ? 100 * ratio : 0;
+        	patches[id]->xfade_samples = (frames / 2 > 100) ? 100 * ratio : 0;
+        	patches[id]->loop_start = patches[id]->xfade_samples;
+        	patches[id]->loop_stop = patches[id]->sample_stop -
                                     patches[id]->xfade_samples;
+    	}
     }
 
     if (patches[id]->sample_stop < patches[id]->fade_samples)
@@ -624,7 +639,8 @@ void patch_set_samplerate (int rate)
                 Sample* s = patches[id]->sample;
                 patch_sample_load(id, s->filename,  s->raw_samplerate,
                                                     s->raw_channels,
-                                                    s->sndfile_format);
+                                                    s->sndfile_format,
+                                                    false);	// jph github#1
             }
         }
 

@@ -19,6 +19,11 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    V0.2.0 / jph
+    - bug github#2 : display of value of sliders in tooltip
+    - bug github#2 : give delay a 10s range, attack and hold a 15s range,
+    				 decay and release a 25s range
 */
 
 
@@ -121,6 +126,9 @@ static void on_cb2(GtkToggleButton* button, EnvelopeTabPrivate* p)
 static void delay_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 {
     float val = phin_slider_get_value(sl);
+
+    phin_slider_set_log (sl, TRUE);											// jph github#2
+    phin_slider_value_in_tooltip(p->delay, val, "s", 3);					// jph github#2
     patch_set_env_delay(p->patch,
         id_selector_get_id(ID_SELECTOR(p->idsel)),val);
 }
@@ -129,6 +137,9 @@ static void delay_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 static void attack_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 {
     float val = phin_slider_get_value(sl);
+
+    phin_slider_set_log (sl, FALSE);											// jph github#2
+    phin_slider_value_in_tooltip(p->attack, val, "s", 3);					// jph github#2
     patch_set_env_attack(p->patch,
         id_selector_get_id(ID_SELECTOR(p->idsel)), val);
 }
@@ -137,6 +148,9 @@ static void attack_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 static void hold_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 {
     float val = phin_slider_get_value(sl);
+
+    phin_slider_set_log (sl, TRUE);											// jph github#2
+    phin_slider_value_in_tooltip(p->hold, val, "s", 3);						// jph github#2
     patch_set_env_hold(p->patch,
         id_selector_get_id(ID_SELECTOR(p->idsel)), val);
 }
@@ -145,6 +159,9 @@ static void hold_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 static void decay_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 {
     float val = phin_slider_get_value(sl);
+
+    phin_slider_set_log (sl, TRUE);											// jph github#2
+    phin_slider_value_in_tooltip(p->decay, val, "s", 3);					// jph github#2
     patch_set_env_decay(p->patch,
         id_selector_get_id(ID_SELECTOR(p->idsel)), val);
 }
@@ -153,6 +170,8 @@ static void decay_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 static void sustain_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 {
     float val = phin_slider_get_value(sl);
+
+    phin_slider_value_in_tooltip(p->sustain, val*100, "%", 1);				// jph github#2
     patch_set_env_sustain(p->patch,
         id_selector_get_id(ID_SELECTOR(p->idsel)), val);
 }
@@ -161,6 +180,9 @@ static void sustain_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 static void release_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 {
     float val = phin_slider_get_value(sl);
+
+    phin_slider_set_log (sl, TRUE);											// jph github#2
+    phin_slider_value_in_tooltip(p->release, val, "s", 3);					// jph github#2
     patch_set_env_release(p->patch,
         id_selector_get_id(ID_SELECTOR(p->idsel)), val);
 }
@@ -284,25 +306,25 @@ static void envelope_tab_init(EnvelopeTab* self)
 
     /* delay */
     gui_label_attach("Delay:", t, a1, a2, y, y + 1);
-    p->delay = phin_hslider_new_with_range(0.1, 0.0, 1.0, 0.01);
+    p->delay = phin_hslider_new_with_range(0.1, 0.0, 10.0, 0.01);	// jph github#2
     gui_attach(t, p->delay, b1, b2, y, y + 1);
     ++y;
 
     /* attack */
     gui_label_attach("Attack:", t, a1, a2, y, y + 1);
-    p->attack = phin_hslider_new_with_range(0.1, 0.0, 1.0, 0.01);
+    p->attack = phin_hslider_new_with_range(0.1, 0.0, 15.0, 0.01);
     gui_attach(t, p->attack, b1, b2, y, y + 1);
     ++y;
 
     /* hold */
     gui_label_attach("Hold:", t, a1, a2, y, y + 1);
-    p->hold = phin_hslider_new_with_range(0.1, 0.0, 1.0, 0.01);
+    p->hold = phin_hslider_new_with_range(0.1, 0.0, 15.0, 0.01);
     gui_attach(t, p->hold, b1, b2, y, y + 1);
     ++y;
 
     /* decay */
     gui_label_attach("Decay:", t, a1, a2, y, y + 1);
-    p->decay = phin_hslider_new_with_range(0.1, 0.0, 1.0, 0.01);
+    p->decay = phin_hslider_new_with_range(0.1, 0.0, 25.0, 0.01);
     gui_attach(t, p->decay, b1, b2, y, y + 1);
     ++y;
 
@@ -314,7 +336,7 @@ static void envelope_tab_init(EnvelopeTab* self)
 
     /* release */
     gui_label_attach("Release:", t, a1, a2, y, y  + 1);
-    p->release = phin_hslider_new_with_range(0.1, 0.0, 1.0, 0.01);
+    p->release = phin_hslider_new_with_range(0.1, 0.0, 25.0, 0.01);
     gui_attach(t, p->release, b1, b2, y, y + 1);
     ++y;
 

@@ -19,6 +19,9 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    V0.2.0 / jph
+    - enh github#3 gcc 4.8.3 compatibility
 */
 
 
@@ -141,8 +144,8 @@ static void set_mode(SampleTabPrivate* p)
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(p->reverse_check)))
         mode |= PATCH_PLAY_REVERSE;
 
-    if (mode & PATCH_PLAY_LOOP
-     && gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(p->to_end_check)))
+    if ((mode & PATCH_PLAY_LOOP)
+     && gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(p->to_end_check)))	// jph #github#3
     {
         mode |= PATCH_PLAY_TO_END;
     }

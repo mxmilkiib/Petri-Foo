@@ -19,6 +19,9 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    V0.2.0 / jph
+    - enh github#1 sample loop points
 */
 
 
@@ -119,7 +122,8 @@ static void cb_load(raw_box* rb)
 
         if (patch_sample_load(patch, name,    samplerate,
                                                 rb->channels,
-                                                get_format(rb)) < 0)
+                                           get_format(rb),
+                                           true) < 0)	// jph github#1
         {
             err = pf_error_get();
             goto fail;
@@ -132,7 +136,7 @@ static void cb_load(raw_box* rb)
         if (s->filename && strcmp(name, s->filename) == 0)
             return;
 
-        if (patch_sample_load(patch, name, 0, 0, 0))
+        if (patch_sample_load(patch, name, 0, 0, 0, true))	// jph github#1
         {
             err = pf_error_get();
             goto fail;
@@ -252,7 +256,8 @@ static void cb_cancel(void)
         patch_sample_load(patch, last_sample->filename,
                                  last_sample->raw_samplerate,
                                  last_sample->raw_channels,
-                                 last_sample->sndfile_format);
+                                 last_sample->sndfile_format,
+                                 true);	// jph github#1
     }
 
     return;

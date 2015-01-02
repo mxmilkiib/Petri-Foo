@@ -557,6 +557,7 @@ static void cb_menu_help_about (GtkWidget* widget, gpointer data)
     GdkPixbuf* logo = 0;
     const char* authors[] = {   "Pete Bessman - original Specimen author",
                                 "James Morris - Petri-Foo creator",
+                                "Jean-Pierre Haenlin for this release http://github.com/jphaenlin/Petri-Foo",
                                 "See the AUTHORS file for others", 0 };
 
 /*  should this be freed later on?  */
@@ -567,7 +568,7 @@ static void cb_menu_help_about (GtkWidget* widget, gpointer data)
         "logo", logo,
         "authors", authors,
         "version", VERSION,
-        "website", "http://petri-foo.sourceforge.net/",
+        "website", "http://petri-foo.sourceforge.net/\n",
         "copyright",    "(C) 2004-2005 Pete Bessman\n"
                         "(C) 2006-2007 others\n"
                         "(C) 2011-2012 James Morris\n",
