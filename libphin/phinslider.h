@@ -65,7 +65,8 @@ struct _PhinSliderClass
 };
 
 
-void phin_slider_value_in_tooltip (GtkWidget* slider, float value, char* unit, char prec); // jph github#2
+void phin_slider_tooltip_init (GtkWidget* slider, char unit, int prec, int fact);	// jph github#2
+void phin_slider_value_in_tooltip (GtkWidget* slider); 								// jph github#2
 
 GType       phin_slider_get_type(   void );
 void        phin_slider_set_value(  PhinSlider*, double );
