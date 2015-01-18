@@ -24,6 +24,7 @@
     - bug github#2 : display of value of sliders in tooltip
     - bug github#2 : give delay a 10s range, attack and hold a 15s range,
     				 decay and release a 25s range
+    - enh github#5 : logarithmic sliders
 */
 
 
@@ -127,8 +128,8 @@ static void delay_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 {
     float val = phin_slider_get_value(sl);
 
-    phin_slider_set_log (sl, TRUE);										// jph github#2
-    phin_slider_value_in_tooltip(p->delay);
+    phin_slider_set_log (sl, TRUE);										// jph github#5
+    phin_slider_value_in_tooltip(p->delay);								// jph github#2
     patch_set_env_delay(p->patch,
         id_selector_get_id(ID_SELECTOR(p->idsel)),val);
 }
@@ -138,7 +139,7 @@ static void attack_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 {
     float val = phin_slider_get_value(sl);
 
-    phin_slider_set_log (sl, TRUE);										// jph github#2
+    phin_slider_set_log (sl, TRUE);
     phin_slider_value_in_tooltip(p->attack);
     patch_set_env_attack(p->patch,
         id_selector_get_id(ID_SELECTOR(p->idsel)), val);
@@ -149,7 +150,7 @@ static void hold_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 {
     float val = phin_slider_get_value(sl);
 
-    phin_slider_set_log (sl, TRUE);										// jph github#2
+    phin_slider_set_log (sl, TRUE);
     phin_slider_value_in_tooltip(p->hold);
     patch_set_env_hold(p->patch,
         id_selector_get_id(ID_SELECTOR(p->idsel)), val);
@@ -160,7 +161,7 @@ static void decay_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 {
     float val = phin_slider_get_value(sl);
 
-    phin_slider_set_log (sl, TRUE);										// jph github#2
+    phin_slider_set_log (sl, TRUE);
     phin_slider_value_in_tooltip(p->decay);
     patch_set_env_decay(p->patch,
         id_selector_get_id(ID_SELECTOR(p->idsel)), val);
@@ -171,7 +172,7 @@ static void sustain_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 {
     float val = phin_slider_get_value(sl);
 
-    phin_slider_value_in_tooltip(p->sustain);							// jph github#2
+    phin_slider_value_in_tooltip(p->sustain);
     patch_set_env_sustain(p->patch,
         id_selector_get_id(ID_SELECTOR(p->idsel)), val);
 }
@@ -181,7 +182,7 @@ static void release_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 {
     float val = phin_slider_get_value(sl);
 
-    phin_slider_set_log (sl, TRUE);										// jph github#2
+    phin_slider_set_log (sl, TRUE);
     phin_slider_value_in_tooltip(p->release);
     patch_set_env_release(p->patch,
         id_selector_get_id(ID_SELECTOR(p->idsel)), val);
@@ -383,16 +384,16 @@ static void update_env(EnvelopeTabPrivate* p)
     phin_slider_set_value(PHIN_SLIDER(p->delay), l);
     phin_slider_value_in_tooltip(p->delay);								// jph github#2
     phin_slider_set_value(PHIN_SLIDER(p->attack), a);
-    phin_slider_value_in_tooltip(p->attack);							// jph github#2
+    phin_slider_value_in_tooltip(p->attack);
     phin_slider_set_value(PHIN_SLIDER(p->hold), h);
-    phin_slider_value_in_tooltip(p->hold);								// jph github#2
+    phin_slider_value_in_tooltip(p->hold);
     phin_slider_set_value(PHIN_SLIDER(p->decay), d);
-    phin_slider_value_in_tooltip(p->decay);								// jph github#2
+    phin_slider_value_in_tooltip(p->decay);
     phin_slider_set_value(PHIN_SLIDER(p->sustain), s);
     phin_slider_tooltip_init(p->sustain, '%', 0, 100);
-    phin_slider_value_in_tooltip(p->sustain);							// jph github#2
+    phin_slider_value_in_tooltip(p->sustain);
     phin_slider_set_value(PHIN_SLIDER(p->release), r);
-    phin_slider_value_in_tooltip(p->release);							// jph github#2
+    phin_slider_value_in_tooltip(p->release);
     phin_slider_set_value(PHIN_SLIDER(p->key), key);
 /*  phin_slider_set_value(PHIN_SLIDER(p->vel), vel); */
 

@@ -21,7 +21,7 @@
     This file is a derivative of a Specimen original, modified 2011
 
     V0.2.0 / jph
-    - enh github#3 gcc 4.8.3 compatibility
+    - enh github#3 correct incompatibilities with gcc 4.8.3
 */
 
 

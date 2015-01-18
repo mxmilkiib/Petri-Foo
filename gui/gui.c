@@ -19,6 +19,9 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    V0.2.0 / jph
+    - bug github#4 add a window and taskbar icon
 */
 
 
@@ -627,6 +630,20 @@ static void cb_recent_chooser_item_activated (GtkRecentChooser *chooser
 }
 
 
+//GdkPixbuf *create_pixbuf(const gchar * filename)
+//{
+//   GdkPixbuf *pixbuf;
+//   GError *error = NULL;
+//   pixbuf = gdk_pixbuf_new_from_file(filename, &error);
+//   if(!pixbuf) {
+//      fprintf(stderr, "%s\n", error->message);
+//      g_error_free(error);
+//   }
+//
+//   return pixbuf;
+//}
+
+
 int gui_init(void)
 {
     GtkWidget* window_vbox;
@@ -644,6 +661,9 @@ int gui_init(void)
 
     g_signal_connect(G_OBJECT(window), "destroy",
                             G_CALLBACK(cb_quit), NULL);
+
+    /* windows icon - jph github#4 */
+    gtk_window_set_default_icon_from_file(PIXMAPS_DIR "/petri-foo_small.png", 0);
 
     /* setup the window's main vbox */
     window_vbox = gtk_vbox_new (FALSE, 0);

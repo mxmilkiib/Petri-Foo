@@ -21,7 +21,7 @@
     This file is a derivative of a Specimen original, modified 2011
 
     V0.2.0 / jph
-    - enh github#1 sample loop points
+    - enh github#1 read sample loop points
 */
 
 
@@ -364,8 +364,8 @@ int sample_load_file(Sample* sample, const char* name,
     float* tmp;
     SF_INFO sfinfo;
     SNDFILE* sfp;
-    unsigned int lstart;	// jph github#1
-    unsigned int lend;
+    unsigned int lstart = 0;	// jph github#1
+    unsigned int lend = 0;
     bool sf_loop_ret;
     int size_o;
     int size_r;

@@ -21,7 +21,7 @@
     This file is a derivative of a Specimen original, modified 2011
 
     V0.2.0 / jph
-    - enh github#1 sample loop points
+    - enh github#1 read sample loop points
 */
 
 

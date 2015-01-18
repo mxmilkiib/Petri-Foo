@@ -20,6 +20,9 @@
     along with Phin.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a PHAT original, modified 2011
+
+    V0.2.0 / jph
+    - bug github#2 : display of value of sliders in tooltip
 */
 
 

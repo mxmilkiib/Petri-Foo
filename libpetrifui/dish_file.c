@@ -17,7 +17,7 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     V0.2.0 / jph
-    - enh github#1 sample loop points
+    - enh github#1 read sample loop points
 */
 
 

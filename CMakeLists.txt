@@ -183,6 +183,7 @@ install (DIRECTORY pixmaps/ DESTINATION ${DATADIR}/pixmaps
           FILES_MATCHING PATTERN "*.png")
 install (FILES petri-foo.xml DESTINATION ${MIME_DIR}/packages)
 install (FILES pixmaps/petri-foo.png DESTINATION ${PIXMAPS_DIR})
+install (FILES pixmaps/petri-foo_small.png DESTINATION ${PIXMAPS_DIR})
 install (FILES petri-foo.desktop DESTINATION ${APPLICATIONS_DIR})
 
 if (UpdateMime)
