@@ -1,6 +1,6 @@
 #define PACKAGE     "${PROJECT_NAME}"
 #define VERSION \
-    "0.${Petri-Foo_VERSION_MAJOR}.${Petri-Foo_VERSION_MINOR}"
+    "mod${Petri-Foo_VERSION_MAJOR}.${Petri-Foo_VERSION_MINOR}"
 
 #ifndef PIXMAPS_DIR
 #define PIXMAPS_DIR "${CMAKE_INSTALL_PREFIX}/${DATADIR}/pixmaps"

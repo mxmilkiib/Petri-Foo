@@ -21,7 +21,7 @@
 
     This file is a derivative of a PHAT original, modified 2011
 
-    V0.2.0 / jph
+    mod1 / jph
     - bug github#2 : display of value of sliders in tooltip
 */
 
@@ -68,8 +68,8 @@ struct _PhinSliderClass
 };
 
 
-void phin_slider_tooltip_init (GtkWidget* slider, char unit, int prec, int fact);	// jph github#2
-void phin_slider_value_in_tooltip (GtkWidget* slider); 								// jph github#2
+void phin_slider_tooltip_init (GtkWidget* slider, char unit, int prec, int fact);	// mod1 github#2
+void phin_slider_value_in_tooltip (GtkWidget* slider); 								// mod1 github#2
 
 GType       phin_slider_get_type(   void );
 void        phin_slider_set_value(  PhinSlider*, double );

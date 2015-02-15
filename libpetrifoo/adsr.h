@@ -75,7 +75,7 @@ void    adsr_init       (ADSR*);
 void    adsr_release    (ADSR*);
 void    adsr_set_params (ADSR*, ADSRParams*);
 float   adsr_tick       (ADSR*);
-void    adsr_trigger    (ADSR*, float key_val, float vel_val);
+void    adsr_trigger    (ADSR*, float key_val, bool mono);
 
 
 float const* adsr_output (ADSR*);

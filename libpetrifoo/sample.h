@@ -20,7 +20,7 @@
 
     This file is a derivative of a Specimen original, modified 2011
 
-    V0.2.0 / jph
+    mod1 / jph
     - enh github#1 read sample loop points
 */
 
@@ -60,7 +60,7 @@ struct _Sample
 
     int loop_start;		/* info present in the sample */
     int loop_end;
-    bool loop_valid;	// jph github#1
+    bool loop_valid;	// mod1 github#1
 
     char*   filename;
 

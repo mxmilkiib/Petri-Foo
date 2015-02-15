@@ -19,6 +19,10 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    mod1 / jph
+    - enh github#5 envelopes with exponential slope
+    - bug github#6 bad envelope in mono mode without legato
 */
 
 
@@ -28,6 +32,7 @@
 #include "ticks.h"
 
 
+#include <math.h>
 #include <stdlib.h>
 
 
@@ -121,12 +126,16 @@ void adsr_init(ADSR* env)
 }
 
 
-void adsr_trigger(ADSR* env, float key, float vel)
+void adsr_trigger(ADSR* env, float key, bool mono)
 {
-    (void)vel; /* why is this still here? */
     env->state = ADSR_STATE_DELAY;
     env->ticks = 0;
-    env->aval = env->val;
+
+    /* if mono & !legato, envelope starts from 0 - // mod1 github#6 */
+    if ( mono )
+    	env->aval = 0;
+    else
+    	env->aval = env->val;
 
     if (env->key_amt < 0)
     {
@@ -181,13 +190,18 @@ void adsr_release (ADSR* env)
 /* return current value between 0 and 1 and advance */
 float adsr_tick(ADSR* e)
 {
-    float d;
+
+#define NTAU 5.0
+
+	double d;
 
     switch (e->state)
     {
     case ADSR_STATE_DELAY:
         if (e->delay)
-        e->val = 0.0;
+        {
+        	e->val = 0.0;
+        }
 
         if (++e->ticks > e->delay)
         {
@@ -204,7 +218,15 @@ float adsr_tick(ADSR* e)
         else
         {
             d = (e->ticks * 1.0) / e->attack;
-            e->val = lerp (e->aval, 1.0, d);
+            // linear or exponential slope - mod1 github#5
+            if ( 0 )
+            {
+            	e->val = lerp (e->aval, 1.0, d);
+            }
+            else
+            {
+            	e->val = 1.0 - exp(-d * NTAU) * (1 - e->aval);
+            }
         }
 
         if (++e->ticks > e->attack)
@@ -232,7 +254,15 @@ float adsr_tick(ADSR* e)
         else
         {
             d = (e->ticks * 1.0) / e->decay;
-            e->val = lerp (1.0, e->sustain, d);
+            // linear or exponential slope - mod1 github#5
+            if ( 0 )
+            {
+            	e->val = lerp (1.0, e->sustain, d);
+            }
+            else
+            {
+            	e->val = exp(-d * NTAU)*(1 - e->sustain) + e->sustain;
+            }
         }
 
         if (++e->ticks > e->decay)
@@ -261,7 +291,15 @@ float adsr_tick(ADSR* e)
         else
         {
             d = (e->ticks * 1.0) / e->release;
-            e->val = lerp (e->rval, 0.0, d);
+            // linear or exponential slope - mod1 github#5
+            if ( 0 )
+            {
+            	e->val = lerp (e->rval, 0.0, d);
+            }
+            else
+            {
+            	e->val = exp(-d * NTAU) * e->rval;
+            }
         }
 
         if (++e->ticks > e->release)

@@ -20,7 +20,7 @@
 
     This file is a derivative of a Specimen original, modified 2011
 
-    V0.2.0 / jph
+    mod1 / jph
     - enh github#3 correct incompatibilities with gcc 4.8.3
 */
 
@@ -38,7 +38,7 @@
 
 static int      start_frame = 0;
 static float    one = 1.0;
-float    (*cc_arr)[16][CC_ARR_SIZE];	// jph #github#3
+float    (*cc_arr)[16][CC_ARR_SIZE];					// mod1 github#3
 
 
 Patch* patch_new(void)
@@ -241,7 +241,7 @@ float const* patch_mod_id_to_pointer(int id, Patch* p, PatchVoice* v)
         return &((*cc_arr)[p->channel][0]);
     }
 
-    if ((id & MOD_SRC_EG) && v)	// jph #github#3
+    if ((id & MOD_SRC_EG) && v)							// mod1 github#3
     {
         id &= ~MOD_SRC_EG;
 
@@ -249,7 +249,7 @@ float const* patch_mod_id_to_pointer(int id, Patch* p, PatchVoice* v)
             return adsr_output(v->env[id]);
     }
 
-    if ((id & MOD_SRC_VLFO) && v)	// jph #github#3
+    if ((id & MOD_SRC_VLFO) && v)						// mod1 github#3
     {
         id &= ~MOD_SRC_VLFO;
 

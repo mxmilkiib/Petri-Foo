@@ -20,7 +20,7 @@
 
     This file is a derivative of a Specimen original, modified 2011
 
-    V0.2.0 / jph
+    mod1 / jph
     - enh github#1 read sample loop points
 */
 
@@ -123,7 +123,7 @@ static void cb_load(raw_box* rb)
         if (patch_sample_load(patch, name,    samplerate,
                                                 rb->channels,
                                            get_format(rb),
-                                           true) < 0)	// jph github#1
+                                           true) < 0)		// mod1 github#1
         {
             err = pf_error_get();
             goto fail;
@@ -136,7 +136,7 @@ static void cb_load(raw_box* rb)
         if (s->filename && strcmp(name, s->filename) == 0)
             return;
 
-        if (patch_sample_load(patch, name, 0, 0, 0, true))	// jph github#1
+        if (patch_sample_load(patch, name, 0, 0, 0, true))	// mod1 github#1
         {
             err = pf_error_get();
             goto fail;
@@ -257,7 +257,7 @@ static void cb_cancel(void)
                                  last_sample->raw_samplerate,
                                  last_sample->raw_channels,
                                  last_sample->sndfile_format,
-                                 true);	// jph github#1
+                                 true);							// mod1 github#1
     }
 
     return;

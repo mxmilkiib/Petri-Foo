@@ -19,6 +19,10 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    mod1 / jph
+    - enh github#5 envelopes with exponential slope
+    - bug github#6 bad envelope in mono mode without legato
 */
 
 
@@ -337,7 +341,10 @@ patch_trigger_patch (Patch* p, int note, float vel, Tick ticks)
 
     /* shutdown any running voices if monophonic */
     if (p->mono)
+    {
         patch_release_patch(p, -69, RELEASE_CUTOFF);
+
+    }
 
     /* fill in our voice */
     v->ticks =      ticks;
@@ -378,7 +385,7 @@ patch_trigger_patch (Patch* p, int note, float vel, Tick ticks)
         if (p->env_params[i].active)
         {
             adsr_set_params(v->env[i], &p->env_params[i]);
-            adsr_trigger(v->env[i], key_track, vel);
+            adsr_trigger(v->env[i], key_track, p->mono & !legato); // mod1 github#6
         }
     }
 

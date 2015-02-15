@@ -21,7 +21,7 @@
 
     This file is a derivative of a PHAT original, modified 2011
 
-    V0.2.0 / jph
+    mod1 / jph
     - bug github#2 : display of value of sliders in tooltip
     - enh github#5 : logarithmic sliders
 */
@@ -165,7 +165,7 @@ static void phin_slider_adjustment_value_changed(GtkAdjustment*,
  * @prec: precision
  * @fact: multiply factor
  *
- * Initialise the parameters of the slider's tooltip - jph github#2
+ * Initialise the parameters of the slider's tooltip - mod1 github#2
  */
 void phin_slider_tooltip_init (GtkWidget* slider, char unit, int prec, int fact)
 {
@@ -182,7 +182,7 @@ void phin_slider_tooltip_init (GtkWidget* slider, char unit, int prec, int fact)
  * phin_slider_value_in_tooltip:
  * @slider: slider to be updated
  *
- * Displays the value of the slider in the tooltip - jph github#2
+ * Displays the value of the slider in the tooltip - mod1 github#2
  */
 void phin_slider_value_in_tooltip (GtkWidget* slider)
 {
@@ -221,7 +221,7 @@ void phin_slider_set_value (PhinSlider* slider, double adj_value)
     gtk_adjustment_set_value (p->adjustment, adj_value);
 
 	/* log slider */
-	if (p->is_log)	// jph github#5
+	if (p->is_log)	// mod1 github#5
 	{
 		value = log10( ((adj_value * 1000)/scale) +1) / 3;
 	}
@@ -268,7 +268,7 @@ double phin_slider_get_value (PhinSlider* slider)
     gdouble scale = upper - lower;
 
     /* log slider */
-    if (p->is_log)	// jph github#5
+    if (p->is_log)	// mod1 github#5
     {
         value = (pow( 1000, prv_value) - 1) * scale/1000;
         if ( value < 0.0 )
@@ -556,7 +556,7 @@ static void phin_slider_init (PhinSlider* slider)
 
     p->adjustment = NULL;
     p->adjustment_prv = (GtkAdjustment*)
-                        gtk_adjustment_new (0.0, 0.0, 1.0, 0.1, 0.05, 0.0); // jph github#2
+                        gtk_adjustment_new (0.0, 0.0, 1.0, 0.1, 0.05, 0.0); // mod1 github#2
     p->val = 0.69;
     p->center_val = -1;
     p->xclick_root = 0;
@@ -1398,7 +1398,7 @@ static void phin_slider_adjustment_value_changed (GtkAdjustment* adj,
     scale = adj_upper - adj_lower;
 
     /* log slider */
-    if (p->is_log)	// jph github#5
+    if (p->is_log)	// mod1 github#5
     {
 //    	nothing special for log sliders, done at phin_slider_set_value()
     	value = (adj_value - adj_lower) / scale;

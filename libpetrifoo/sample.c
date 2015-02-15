@@ -20,7 +20,7 @@
 
     This file is a derivative of a Specimen original, modified 2011
 
-    V0.2.0 / jph
+    mod1 / jph
     - enh github#1 read sample loop points
 */
 
@@ -329,7 +329,7 @@ int sample_get_resampled_size(const char* name, int rate,
 
 
 /*
- *	get loop informations from sample data - jph github#1
+ *	get loop informations from sample data - mod1 github#1
  */
 static bool sample_get_loop_info( SNDFILE *sndfile, unsigned int *start, unsigned int *end)
 {
@@ -364,7 +364,7 @@ int sample_load_file(Sample* sample, const char* name,
     float* tmp;
     SF_INFO sfinfo;
     SNDFILE* sfp;
-    unsigned int lstart = 0;	// jph github#1
+    unsigned int lstart = 0;	// mod1 github#1
     unsigned int lend = 0;
     bool sf_loop_ret;
     int size_o;
@@ -382,7 +382,7 @@ int sample_load_file(Sample* sample, const char* name,
     if (!(tmp = read_audio(sfp, &sfinfo)))
         return -1;
 
-    /* get loop points - jph github#1 */
+    /* get loop points - mod1 github#1 */
     sf_loop_ret = sample_get_loop_info( sfp, &lstart, &lend);
 
     sf_close(sfp);
@@ -405,7 +405,7 @@ int sample_load_file(Sample* sample, const char* name,
             JACK is not running, useful under debug conditions. */
         if (rate > 0 && sfinfo.samplerate != rate)
         {
-        	size_o = sfinfo.frames;	// jph github#1
+        	size_o = sfinfo.frames;	// mod1 github#1
 
             float* tmp2 = resample(tmp, rate, &sfinfo);
 
@@ -418,7 +418,7 @@ int sample_load_file(Sample* sample, const char* name,
             free(tmp);
             tmp = tmp2;
 
-            /* modify loop points according to the new length - jph github#1 */
+            /* modify loop points according to the new length - mod1 github#1 */
             if ( sf_loop_ret )
             {
 				size_r = sfinfo.frames;
@@ -453,7 +453,7 @@ int sample_load_file(Sample* sample, const char* name,
 
     sample->default_sample = false;
 	
-    if ( sf_loop_ret )	// jph github#1
+    if ( sf_loop_ret )	// mod1 github#1
     {
     	if ( lstart > (unsigned int) sample->frames )
     		lstart = sample->frames;

@@ -20,7 +20,7 @@
 
     This file is a derivative of a Specimen original, modified 2011
 
-    V0.2.0 / jph
+    mod1 / jph
     - bug github#4 add a window and taskbar icon
 */
 
@@ -560,7 +560,7 @@ static void cb_menu_help_about (GtkWidget* widget, gpointer data)
     GdkPixbuf* logo = 0;
     const char* authors[] = {   "Pete Bessman - original Specimen author",
                                 "James Morris - Petri-Foo creator",
-                                "Jean-Pierre Haenlin for this release http://github.com/jphaenlin/Petri-Foo",
+                                "Jean-Pierre Haenlin - http://github.com/jphaenlin/Petri-Foo",
                                 "See the AUTHORS file for others", 0 };
 
 /*  should this be freed later on?  */
@@ -572,9 +572,7 @@ static void cb_menu_help_about (GtkWidget* widget, gpointer data)
         "authors", authors,
         "version", VERSION,
         "website", "http://petri-foo.sourceforge.net/\n",
-        "copyright",    "(C) 2004-2005 Pete Bessman\n"
-                        "(C) 2006-2007 others\n"
-                        "(C) 2011-2012 James Morris\n",
+        "license", "GNU GPL V2\n",
         "comments",
         #if HAVE_LIBLO
         "Built with Non-Session-Manager support\n"
@@ -662,7 +660,7 @@ int gui_init(void)
     g_signal_connect(G_OBJECT(window), "destroy",
                             G_CALLBACK(cb_quit), NULL);
 
-    /* windows icon - jph github#4 */
+    /* windows icon - mod1 github#4 */
     gtk_window_set_default_icon_from_file(PIXMAPS_DIR "/petri-foo_small.png", 0);
 
     /* setup the window's main vbox */
