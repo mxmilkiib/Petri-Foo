@@ -1,5 +1,5 @@
-tar -xjf petri-foo-0.1.4.tar.bz2
-cd petri-foo-0.1.4
+decompress archive in petri-foo-xxx directory
+cd petri-foo-xxx
 cmake .
 make
 
@@ -8,5 +8,3 @@ gui/petri-foo
 
 to install:
 make install
-
-

@@ -1,11 +1,13 @@
 
-V0.2.0	* 2015-00-00 * jph * https://github.com/jphaenlin/Petri-Foo
+MOD1	* in progress... * jph * https://github.com/jphaenlin/Petri-Foo
 
 	* enh github#1 : Ability to read loop points in the wav file
 	* bug github#2 : Make EG times longer
 	* enh github#3 : Suppress compilation errors with gcc 4.8.3
 	* bug github#4 : Add a window and taskbar icon
 	* enh github#5 : Make EG sliders logarithmic
+	* enh github#6 : Envelopes with exponential slope
+	* bug github#7 : Bad behaviour of envelopes in mono mode without legato
 
 
 2012-08-06 James Morris <james@jwm-art.net>

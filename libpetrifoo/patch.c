@@ -21,8 +21,7 @@
     This file is a derivative of a Specimen original, modified 2011
 
     mod1 / jph
-    - enh github#5 envelopes with exponential slope
-    - bug github#6 bad envelope in mono mode without legato
+    - bug github#7 bad envelope in mono mode without legato
 */
 
 
@@ -385,7 +384,7 @@ patch_trigger_patch (Patch* p, int note, float vel, Tick ticks)
         if (p->env_params[i].active)
         {
             adsr_set_params(v->env[i], &p->env_params[i]);
-            adsr_trigger(v->env[i], key_track, p->mono & !legato); // mod1 github#6
+            adsr_trigger(v->env[i], key_track, p->mono & !legato); // mod1 github#7
         }
     }
 

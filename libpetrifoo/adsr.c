@@ -21,8 +21,8 @@
     This file is a derivative of a Specimen original, modified 2011
 
     mod1 / jph
-    - enh github#5 envelopes with exponential slope
-    - bug github#6 bad envelope in mono mode without legato
+    - enh github#6 envelopes with exponential slope
+    - bug github#7 bad envelope in mono mode without legato
 */
 
 
@@ -131,7 +131,7 @@ void adsr_trigger(ADSR* env, float key, bool mono)
     env->state = ADSR_STATE_DELAY;
     env->ticks = 0;
 
-    /* if mono & !legato, envelope starts from 0 - // mod1 github#6 */
+    /* if mono & !legato, envelope starts from 0 - // mod1 github#7 */
     if ( mono )
     	env->aval = 0;
     else
@@ -218,7 +218,7 @@ float adsr_tick(ADSR* e)
         else
         {
             d = (e->ticks * 1.0) / e->attack;
-            // linear or exponential slope - mod1 github#5
+            // linear or exponential slope - mod1 github#6
             if ( 0 )
             {
             	e->val = lerp (e->aval, 1.0, d);
@@ -254,7 +254,7 @@ float adsr_tick(ADSR* e)
         else
         {
             d = (e->ticks * 1.0) / e->decay;
-            // linear or exponential slope - mod1 github#5
+            // linear or exponential slope - mod1 github#6
             if ( 0 )
             {
             	e->val = lerp (1.0, e->sustain, d);
@@ -291,7 +291,7 @@ float adsr_tick(ADSR* e)
         else
         {
             d = (e->ticks * 1.0) / e->release;
-            // linear or exponential slope - mod1 github#5
+            // linear or exponential slope - mod1 github#6
             if ( 0 )
             {
             	e->val = lerp (e->rval, 0.0, d);
