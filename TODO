@@ -6,6 +6,7 @@ bug : DC is output when envelope of filter returns to 0 (cutoff=0, attack!=0, de
 bug : the name of the patch is not changed when we do "save as"
 add param in envelope tab for exp slopes
 
+
 ideas for MOD2 :
 ----------------
 multi out
