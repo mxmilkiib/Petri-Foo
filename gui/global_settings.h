@@ -15,6 +15,9 @@
 
     You should have received a copy of the GNU General Public License
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
+
+    mod1 / jph
+    - enh github#5 logarithmic sliders
 */
 
 
@@ -39,7 +42,7 @@ typedef struct global_settings_def
 
     char*   sample_file_filter;
     bool    sample_auto_preview;
-
+    bool	log_sliders;				// mod1 github#5
 } global_settings;
 
 
