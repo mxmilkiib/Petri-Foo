@@ -39,6 +39,7 @@
 #include "mod_src.h"
 #include "names.h"
 #include "patch_set_and_get.h"
+#include "global_settings.h"
 
 
 enum
@@ -359,8 +360,10 @@ static void update_env(EnvelopeTabPrivate* p)
     int i = p->patch;
     float l, a, h, d, s, r, key;
     bool on;
-
+    bool log;
+    global_settings* settings = settings_get();
     int id;
+
 
     id = id_selector_get_id(ID_SELECTOR(p->idsel));
 
@@ -376,21 +379,24 @@ static void update_env(EnvelopeTabPrivate* p)
 
     block(p);
 
+    /* log or lin sliders github#5 */
+    log = settings->log_sliders;
+
     phin_slider_set_value(PHIN_SLIDER(p->delay), l);
     phin_slider_value_in_tooltip(p->delay);								// mod1 github#2
-    phin_slider_set_log (PHIN_SLIDER(p->delay), TRUE);					// mod1 github#5
+    phin_slider_set_log (PHIN_SLIDER(p->delay), log);					// mod1 github#5
 
     phin_slider_set_value(PHIN_SLIDER(p->attack), a);
     phin_slider_value_in_tooltip(p->attack);
-    phin_slider_set_log (PHIN_SLIDER(p->attack), TRUE);
+    phin_slider_set_log (PHIN_SLIDER(p->attack), log);
 
     phin_slider_set_value(PHIN_SLIDER(p->hold), h);
     phin_slider_value_in_tooltip(p->hold);
-    phin_slider_set_log (PHIN_SLIDER(p->hold), TRUE);
+    phin_slider_set_log (PHIN_SLIDER(p->hold), log);
 
     phin_slider_set_value(PHIN_SLIDER(p->decay), d);
     phin_slider_value_in_tooltip(p->decay);
-    phin_slider_set_log (PHIN_SLIDER(p->decay), TRUE);
+    phin_slider_set_log (PHIN_SLIDER(p->decay), log);
 
     phin_slider_set_value(PHIN_SLIDER(p->sustain), s);
     phin_slider_tooltip_init(p->sustain, '%', 0, 100);
@@ -398,7 +404,7 @@ static void update_env(EnvelopeTabPrivate* p)
 
     phin_slider_set_value(PHIN_SLIDER(p->release), r);
     phin_slider_value_in_tooltip(p->release);
-    phin_slider_set_log (PHIN_SLIDER(p->release), TRUE);
+    phin_slider_set_log (PHIN_SLIDER(p->release), log);
 
     phin_slider_set_value(PHIN_SLIDER(p->key), key);
 /*  phin_slider_set_value(PHIN_SLIDER(p->vel), vel); */

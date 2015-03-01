@@ -511,7 +511,7 @@ int patch_sample_load(int id, const char *name,
     return val;
 }
 
-
+/* not used -jph */
 int patch_sample_load_from(int dest_id, int src_id)
 {
     int val;

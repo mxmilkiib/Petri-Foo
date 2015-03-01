@@ -15,6 +15,9 @@
 
     You should have received a copy of the GNU General Public License
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
+
+    mod1 / jph
+    - enh github#5 logarithmic sliders
 */
 
 #include <stdlib.h>
@@ -179,6 +182,12 @@ int settings_read(const char* path)
                         sync_set_method(SYNC_METHOD_MIDI);
                 }
 
+                if (xmlStrcmp(prop, BAD_CAST "log-sliders") == 0)		// mod1 github#5
+                {
+                    gbl_settings->log_sliders =
+                        xmlstr_to_gboolean(xmlGetProp(node2,
+                                                        BAD_CAST "value"));
+                }
             }
         }
     }
@@ -288,6 +297,14 @@ int settings_write()
                       BAD_CAST (sync_get_method() == SYNC_METHOD_JACK
                                     ? "jack"
                                     : "midi"));
+
+    node2 = xmlNewTextChild(node1, NULL, BAD_CAST "property", NULL);	// mod1 github#5
+    xmlNewProp(node2, BAD_CAST "name", BAD_CAST "log-sliders");
+    xmlNewProp(node2, BAD_CAST "type", BAD_CAST "boolean");
+    xmlNewProp(node2, BAD_CAST "value",
+                      BAD_CAST (gbl_settings->log_sliders
+                                    ? "true"
+                                    : "false"));
 
     debug("attempting to write file:%s\n",gbl_settings->filename);
 

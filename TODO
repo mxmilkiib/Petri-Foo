@@ -4,7 +4,9 @@ display sample characteristics in choice window and sample window
 modify default patch, initpatch.petri-foo, or last patch...
 bug : DC is output when envelope of filter returns to 0 (cutoff=0, attack!=0, decay=0)
 bug : the name of the patch is not changed when we do "save as"
-verify the tuning of notes
-add glogal param for lin/log sliders
 add param in envelope tab for exp slopes
-bug in pitch bend param
+
+ideas for MOD2 :
+----------------
+multi out
+automatic root note

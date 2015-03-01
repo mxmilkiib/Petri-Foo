@@ -22,6 +22,7 @@
 
     mod1 / jph
     - bug github#4 add a window and taskbar icon
+    - enh github#5 logarithmic sliders
 */
 
 
@@ -89,6 +90,7 @@ static GtkWidget* menu_file_export = 0;
 
 /* settings */
 static GtkWidget* menu_settings_auto_preview = 0;
+static GtkWidget* menu_settings_log_sliders = 0;
 
 /* view */
 static GtkWidget* menu_view_log_display = 0;
@@ -523,6 +525,16 @@ static void cb_menu_settings_auto_preview(GtkWidget* widget, gpointer data)
 }
 
 
+static void cb_menu_settings_log_sliders(GtkWidget* widget, gpointer data)	// mod1 github#5
+{
+    (void)widget;(void)data;
+    global_settings* settings = settings_get();
+    settings->log_sliders = gtk_check_menu_item_get_active(
+                        GTK_CHECK_MENU_ITEM(menu_settings_log_sliders));
+    gui_refresh();
+}
+
+
 void cb_menu_view_log_display_showing(gboolean active)
 {
     gtk_check_menu_item_set_active(
@@ -560,7 +572,7 @@ static void cb_menu_help_about (GtkWidget* widget, gpointer data)
     GdkPixbuf* logo = 0;
     const char* authors[] = {   "Pete Bessman - original Specimen author",
                                 "James Morris - Petri-Foo creator",
-                                "Jean-Pierre Haenlin - http://github.com/jphaenlin/Petri-Foo",
+                                "Jean-Pierre Haenlin",
                                 "See the AUTHORS file for others", 0 };
 
 /*  should this be freed later on?  */
@@ -571,7 +583,7 @@ static void cb_menu_help_about (GtkWidget* widget, gpointer data)
         "logo", logo,
         "authors", authors,
         "version", VERSION,
-        "website", "http://petri-foo.sourceforge.net/\n",
+        "website", "http://petri-foo.sourceforge.net/\n" "http://github.com/jphaenlin/Petri-Foo\n",
         "license", "GNU GPL V2\n",
         "comments",
         #if HAVE_LIBLO
@@ -750,6 +762,20 @@ int gui_init(void)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_settings),
                                         menu_settings_auto_preview);
     gtk_widget_show(menu_settings_auto_preview);
+
+    /* log sliders github#5 */
+    menu_settings_log_sliders =
+        gtk_check_menu_item_new_with_label("Logarithmic sliders");
+    gtk_check_menu_item_set_active(
+        GTK_CHECK_MENU_ITEM(menu_settings_log_sliders),
+            settings->log_sliders);
+
+    g_signal_connect(GTK_OBJECT(menu_settings_log_sliders), "toggled",
+        G_CALLBACK(cb_menu_settings_log_sliders), NULL);
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu_settings),
+    		menu_settings_log_sliders);
+    gtk_widget_show(menu_settings_log_sliders);
 
     /* view menu */
     menu_view = gui_menu_add(menubar, "View", NULL, NULL);

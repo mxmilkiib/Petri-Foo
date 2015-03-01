@@ -1,10 +1,10 @@
 
-MOD1	* in progress... * jph * https://github.com/jphaenlin/Petri-Foo
+MOD1 in progress... Jean-Pierre Haenlin * https://github.com/jphaenlin/Petri-Foo
 
 	* enh github#1 : Ability to read loop points in the wav file
 	* bug github#2 : Make EG times longer
 	* enh github#3 : Suppress compilation errors with gcc 4.8.3
-	* bug github#4 : Add a window and taskbar icon
+	* bug github#4 : Add a window and taskbar icon (gtk)
 	* enh github#5 : Make EG sliders logarithmic
 	* enh github#6 : Envelopes with exponential slope
 	* bug github#7 : Bad behaviour of envelopes in mono mode without legato
