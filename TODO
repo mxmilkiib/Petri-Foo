@@ -1,13 +1,12 @@
 TODO list for MOD1 release :
 ----------------------------
-display sample characteristics in choice window and sample window
 modify default patch, initpatch.petri-foo, or last patch...
 bug : DC is output when envelope of filter returns to 0 (cutoff=0, attack!=0, decay=0)
 bug : the name of the patch is not changed when we do "save as"
-add param in envelope tab for exp slopes
 
 
 ideas for MOD2 :
 ----------------
+LV2 plugin, managed like LinuxSampler
 multi out
 automatic root note

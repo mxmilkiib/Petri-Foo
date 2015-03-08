@@ -19,6 +19,9 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    mod1 / jph
+	- enh github#8 display sample characteritics in sample select window
 */
 
 
@@ -125,7 +128,7 @@ static Event            direct_events[EVENTMAX]; /* incoming from audio
                                                     thread              */
 
 static int              direct_events_end;
-static int              samplerate = -1;
+static int              mixer_samplerate = -1;
 
 static jack_client_t*   jc;
 
@@ -439,18 +442,19 @@ void mixer_direct_control(int chan, int param, float value, Tick tick)
 }
 
 
-void mixer_preview(char *name,  int raw_samplerate,
-                                    int raw_channels,
-                                    int sndfile_format,
-                                    int resample_sndfile)
+void mixer_preview(char *name, int* smp_samplerate,						// mod1 github#8
+                               int* smp_channels,
+                               int* smp_format,
+                               int resample_sndfile,
+							   int loadwithnosound)
 {
     pthread_mutex_lock(&preview.mutex);
     preview.active = 0;
 
-    if (sample_load_file(preview.sample, name,  samplerate,
-                                                raw_samplerate,
-                                                raw_channels,
-                                                sndfile_format,
+    if (sample_load_file(preview.sample, name,  mixer_samplerate,
+                                                *smp_samplerate,
+                                                *smp_channels,
+                                                *smp_format,
                                                 resample_sndfile) == -1)
     {
         /*  sample_load_file might call pf_error via sample_open etc
@@ -462,8 +466,15 @@ void mixer_preview(char *name,  int raw_samplerate,
         return;
     }
 
+    /* returns sample characteristics - mod1 github#8 */
+    *smp_samplerate = preview.sample->file_samplerate;
+    *smp_channels = preview.sample->file_channels;
+    *smp_format = preview.sample->file_format;
+
     preview.next_frame = 0;
-    preview.active = 1;
+    /* this allows to read sample characteristics - mod1 github#8 */
+    if (! loadwithnosound )
+    	preview.active = 1;
     pthread_mutex_unlock(&preview.mutex);
 }
 
@@ -506,7 +517,7 @@ float mixer_get_amplitude(void)
 /* set internally assumed samplerate */
 void mixer_set_samplerate(int rate)
 {
-    samplerate = rate;
+    mixer_samplerate = rate;
 }
 
 

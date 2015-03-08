@@ -61,8 +61,9 @@ struct _ADSR
     float   sustain;    /* sustain level [0.0, 1.0]                     */
     Tick    release;    /* release length in ticks                      */
 
-    float key_amt;
+    float 	key_amt;
 /*  float vel_amt; */
+    bool	exp;		/* exp/lin slope - mod1 github#6 */
 
 };
 
@@ -79,6 +80,7 @@ void adsr_params_init(ADSRParams* params, float attack, float release)
 
     params->key_amt = 0.0;
 /*  params->vel_amt = 0.0; */
+    params->exp 	=    false;		// mod1 github#6
 }
 
 
@@ -123,6 +125,7 @@ void adsr_init(ADSR* env)
     env->release = 0;
 
     env->key_amt = 0.0;
+    env->exp 	 = false;
 }
 
 
@@ -219,7 +222,7 @@ float adsr_tick(ADSR* e)
         {
             d = (e->ticks * 1.0) / e->attack;
             // linear or exponential slope - mod1 github#6
-            if ( 0 )
+            if (! e->exp )
             {
             	e->val = lerp (e->aval, 1.0, d);
             }
@@ -255,7 +258,7 @@ float adsr_tick(ADSR* e)
         {
             d = (e->ticks * 1.0) / e->decay;
             // linear or exponential slope - mod1 github#6
-            if ( 0 )
+            if (! e->exp )
             {
             	e->val = lerp (1.0, e->sustain, d);
             }
@@ -292,7 +295,7 @@ float adsr_tick(ADSR* e)
         {
             d = (e->ticks * 1.0) / e->release;
             // linear or exponential slope - mod1 github#6
-            if ( 0 )
+            if (! e->exp )
             {
             	e->val = lerp (e->rval, 0.0, d);
             }
@@ -321,14 +324,24 @@ float adsr_tick(ADSR* e)
 
 void adsr_set_params (ADSR* env, ADSRParams* params)
 {
+	float length = 1.0;
+
+	/* for exp slope, the length of the segment is mult by 2
+	 * to give almost the same feeling in exp and lin mode
+	 * ie -20dB in exp -> 0dB in lin mode - mod1 github#6 */
+	if ( params->exp )
+	{
+		length = 2.0;
+	}
     env->_delay   = ticks_secs_to_ticks (params->delay);
-    env->_attack  = ticks_secs_to_ticks (params->attack);
+    env->_attack  = ticks_secs_to_ticks (params->attack * length);
     env->_hold    = ticks_secs_to_ticks (params->hold);
-    env->_decay   = ticks_secs_to_ticks (params->decay);
+    env->_decay   = ticks_secs_to_ticks (params->decay * length);
     env->_sustain = params->sustain;
-    env->_release = ticks_secs_to_ticks (params->release);
+    env->_release = ticks_secs_to_ticks (params->release * length);
     env->key_amt  = params->key_amt;
 /*  env->vel_amt  = params->vel_amt; */
+    env->exp      = params->exp;
 }
 
 

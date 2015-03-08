@@ -56,7 +56,11 @@ struct _Sample
 
     int raw_samplerate; /* if the sample was a regular sound file ie */
     int raw_channels;   /* with a header, then these fields will be  */
-    int sndfile_format; /* zero. if raw, they will be non-zero       */
+    int raw_format; 	/* zero. if raw, they will be non-zero       */
+
+    int file_samplerate;// mod1 github#8
+    int file_channels;
+    int file_format;
 
     int loop_start;		/* info present in the sample */
     int loop_end;
@@ -85,9 +89,9 @@ int         sample_get_resampled_size(const char* name, int rate,
 
 
 int         sample_load_file(Sample*, const char* name, int rate,
-    /* zero for non-raw data */         int raw_samplerate,
-    /* zero for non-raw data */         int raw_channels,
-    /* zero for non-raw data */         int sndfile_format,
+    /* zero for non-raw data */         int smp_samplerate,
+    /* zero for non-raw data */         int smp_channels,
+    /* zero for non-raw data */         int smp_format,
                                         int resample_sndfile);
 
 

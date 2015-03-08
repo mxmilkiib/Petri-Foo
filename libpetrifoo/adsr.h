@@ -19,6 +19,9 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    mod1 / jph
+    - enh github#6 : envelopes with exponential slope
 */
 
 
@@ -59,6 +62,7 @@ typedef struct _ADSRParams
 
     float key_amt;  /* key tracking amount      */
 /*  float vel_amt;     velocity sensing amount  */
+    bool  exp;		/* exp/lin slope - mod1 github#6 */
 
 } ADSRParams;
 

@@ -22,6 +22,7 @@
 
     mod1 / jph
     - enh github#1 read sample loop points
+	- enh github#8 display sample characteritics in sample select window
 */
 
 
@@ -120,8 +121,8 @@ static void cb_load(raw_box* rb)
         int samplerate = gtk_spin_button_get_value_as_int(
                                     GTK_SPIN_BUTTON(rb->samplerate));
 
-        if (patch_sample_load(patch, name,    samplerate,
-                                                rb->channels,
+        if (patch_sample_load(patch, name, samplerate,
+                                           rb->channels,
                                            get_format(rb),
                                            true) < 0)		// mod1 github#1
         {
@@ -211,6 +212,11 @@ fail:
 static void cb_preview(raw_box* rb)
 {
     char *name;
+    int smp_samplerate;
+	int smp_channels;
+    int smp_format;
+    GtkTreeIter iter;
+
 
     name = gtk_file_chooser_get_filename(
                                 GTK_FILE_CHOOSER(rb->dialog));
@@ -224,14 +230,40 @@ static void cb_preview(raw_box* rb)
     {
         int samplerate = gtk_spin_button_get_value_as_int(
                                     GTK_SPIN_BUTTON(rb->samplerate));
-
-        mixer_preview(name, samplerate,  rb->channels, get_format(rb),1);
+        smp_samplerate = samplerate;
+        smp_channels = rb->channels;
+        smp_format = get_format(rb);
+        mixer_preview(name, &smp_samplerate, &smp_channels, &smp_format, 1, rb->dont_preview);
     }
     else
     {
         int resamp = gtk_toggle_button_get_active(
                             GTK_TOGGLE_BUTTON(rb->resample_checkbox));
-        mixer_preview(name, 0, 0, 0, resamp);
+        smp_samplerate = 0;
+        smp_channels = 0;
+        smp_format = 0;
+        /* the test of rb->dont_preview is done in mixer_preview
+         * to allow the reading of sample characteristics - mod1 github#8 */
+        mixer_preview(name, &smp_samplerate, &smp_channels, &smp_format, resamp, rb->dont_preview);
+
+        /* updates sample characteristics - mod1 github#8 */
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rb->mono), (smp_channels == 1));
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rb->stereo), (smp_channels == 2));
+
+        if ( (smp_samplerate >= 8000) && (smp_samplerate <= 192000) )
+        	gtk_spin_button_set_value(GTK_SPIN_BUTTON(rb->samplerate), smp_samplerate);
+
+        int endian = (smp_format & SF_FORMAT_ENDMASK) >> 28;
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rb->file_endian), (endian == 0));
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rb->little_endian), (endian == 1));
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rb->big_endian), (endian == 2));
+
+        int combo_format = (smp_format & SF_FORMAT_SUBMASK) | SF_FORMAT_RAW;
+        if (basic_combo_get_iter_at_index(rb->format, combo_format, &iter))
+        {
+        	gtk_combo_box_set_active_iter(GTK_COMBO_BOX(rb->format), &iter);
+        }
+        gtk_widget_show_all(rb->table);
     }
 
     return;
@@ -256,7 +288,7 @@ static void cb_cancel(void)
         patch_sample_load(patch, last_sample->filename,
                                  last_sample->raw_samplerate,
                                  last_sample->raw_channels,
-                                 last_sample->sndfile_format,
+                                 last_sample->raw_format,
                                  true);							// mod1 github#1
     }
 
@@ -290,7 +322,9 @@ static void raw_toggled_cb(GtkToggleButton* raw_toggle, gpointer data)
     if (gtk_toggle_button_get_active(raw_toggle))
         gtk_widget_show_all(rb->table);
     else
-        gtk_widget_hide(rb->table);
+        // mod1 github#8 table always visible, used to display sample characteristics
+        //gtk_widget_hide(rb->table);
+    	gtk_widget_show_all(rb->table);
 }
 
 
@@ -329,7 +363,7 @@ static raw_box* raw_box_new(GtkWidget* dialog)
 
     rb->resample_checkbox = gtk_check_button_new_with_label("Resample");
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rb->resample_checkbox),
-                                                                TRUE);		// jph mod1
+                                                                TRUE);		// mod1 github#8
     gtk_widget_show(rb->resample_checkbox);
     gtk_box_pack_start(GTK_BOX(rb->toggle_box), rb->resample_checkbox,
                                                         FALSE, FALSE, 0);
@@ -383,8 +417,9 @@ static raw_box* raw_box_new(GtkWidget* dialog)
     g_signal_connect(GTK_OBJECT(rb->big_endian),    "toggled",
                                 G_CALLBACK(raw_toggles_toggled_cb), rb);
 
-    /* table should be hidden by default */
-    gtk_widget_hide(rb->table);
+    // mod1 github#8 table always visible, used to display sample characteristics
+    // gtk_widget_hide(rb->table);
+    gtk_widget_show_all(rb->table);
 
     g_signal_connect(GTK_OBJECT(rb->rawcheck), "toggled",
                                             G_CALLBACK(raw_toggled_cb), rb);
@@ -547,8 +582,9 @@ static void selection_changed_cb(GtkFileChooser* dialog, gpointer data)
     debug("selection changed... dont_preview:%s\n",
                     (rb->dont_preview ? "T" : "F"));
 
-    if (rb->dont_preview)
-        return;
+    // the test of rb->dont_preview is done later - mod1 github#8
+    //    if (rb->dont_preview)
+    //        return;
 
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(rb->auto_preview)))
         cb_preview(rb);

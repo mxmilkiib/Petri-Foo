@@ -22,6 +22,7 @@
 
     mod1 / jph
     - enh github#1 read sample loop points
+	- enh github#8 display sample characteritics in sample select window
 */
 
 
@@ -56,7 +57,11 @@ Sample* sample_new(void)
 
     sample->raw_samplerate = 0;
     sample->raw_channels = 0;
-    sample->sndfile_format = 0;
+    sample->raw_format = 0;
+
+    sample->file_samplerate = 0;
+    sample->file_channels = 0;
+    sample->file_format = 0;
 
     sample->default_sample = false;
 
@@ -77,8 +82,12 @@ void sample_shallow_copy(Sample* dest, const Sample* src)
     dest->sp =              0;
     dest->frames =          src->frames;
     dest->raw_samplerate =  src->raw_samplerate;
-    dest->raw_channels =    src->raw_channels;
-    dest->sndfile_format =  src->sndfile_format;
+    dest->raw_channels = 	src->raw_channels;
+    dest->raw_format =  	src->raw_format;
+
+    dest->file_samplerate = src->file_samplerate;
+    dest->file_channels = 	src->file_channels;
+    dest->file_format =  	src->file_format;
 
     debug("src->filename:[%p] \n", src->filename);
 
@@ -243,11 +252,11 @@ static float* read_audio(SNDFILE* sfp, SF_INFO* sfinfo)
 static SNDFILE* open_sample(SF_INFO* sfinfo, const char* name,
                                         int raw_samplerate,
                                         int raw_channels,
-                                        int sndfile_format)
+                                        int raw_format)
 {
     SNDFILE* sfp = NULL;
 
-    bool raw = (raw_samplerate || raw_channels || sndfile_format);
+    bool raw = (raw_samplerate || raw_channels || raw_format);
 
     sfinfo->frames = 0;
     sfinfo->samplerate = 0;
@@ -264,12 +273,12 @@ static SNDFILE* open_sample(SF_INFO* sfinfo, const char* name,
         int i;
 
         for (i = 0; idnames[i].name != 0; ++i)
-            if (idnames[i].id == sndfile_format)
+            if (idnames[i].id == raw_format)
                 fmt_name = idnames[i].name;
 
         sfinfo->samplerate = raw_samplerate;
         sfinfo->channels =   raw_channels;
-        sfinfo->format =     sndfile_format;
+        sfinfo->format =     raw_format;
 
         debug("Reading raw sample %s as %d %s %s\n",
                                 name, raw_samplerate,
@@ -301,15 +310,15 @@ static SNDFILE* open_sample(SF_INFO* sfinfo, const char* name,
 int sample_get_resampled_size(const char* name, int rate,
                                         int raw_samplerate,
                                         int raw_channels,
-                                        int sndfile_format)
+                                        int raw_format)
 {
     SF_INFO sfinfo;
     SNDFILE* sfp;
     sf_count_t frames;
 
-    if (!(sfp = open_sample(&sfinfo, name,  raw_samplerate,
-                                            raw_channels,
-                                            sndfile_format)))
+    if (!(sfp = open_sample(&sfinfo, name, raw_samplerate,
+                                           raw_channels,
+                                           raw_format)))
     {
         return -1;
     }
@@ -353,12 +362,14 @@ static bool sample_get_loop_info( SNDFILE *sndfile, unsigned int *start, unsigne
 	return result;
 }
 
-
-int sample_load_file(Sample* sample, const char* name,
-                                        int rate,
-                                        int raw_samplerate,
-                                        int raw_channels,
-                                        int sndfile_format,
+/* if raw sample, smp_xxx arguments gives the sample characteristics
+ * if not, the Sample structure is updated with the data given by the snd file
+ * mod1 github#8
+ */
+int sample_load_file(Sample* sample, const char* name, int rate,
+                                        int smp_samplerate,
+                                        int smp_channels,
+                                        int smp_format,
                                         int resample_sndfile)
 {
     float* tmp;
@@ -372,9 +383,9 @@ int sample_load_file(Sample* sample, const char* name,
     double ratio;
 
 
-    if (!(sfp = open_sample(&sfinfo, name,  raw_samplerate,
-                                            raw_channels,
-                                            sndfile_format)))
+    if (!(sfp = open_sample(&sfinfo, name,  smp_samplerate,
+                                            smp_channels,
+                                            smp_format)))
     {
         return -1;
     }
@@ -387,17 +398,24 @@ int sample_load_file(Sample* sample, const char* name,
 
     sf_close(sfp);
 
-    if (raw_samplerate || raw_channels || sndfile_format)
+    /* if raw sample */
+    if (smp_samplerate || smp_channels || smp_format)
     {
-        sample->raw_samplerate = raw_samplerate;
-        sample->raw_channels =   raw_channels;
-        sample->sndfile_format = sndfile_format;
+        sample->raw_samplerate = smp_samplerate;					// mod1 github#8
+        sample->raw_channels = smp_channels;
+        sample->raw_format = smp_format;
+        sample->file_samplerate = 0;
+        sample->file_channels = 0;
+        sample->file_format = 0;
     }
     else
     {
         sample->raw_samplerate = 0;
         sample->raw_channels = 0;
-        sample->sndfile_format = 0;
+        sample->raw_format = 0;
+        sample->file_samplerate = sfinfo.samplerate;
+        sample->file_channels = sfinfo.channels;
+        sample->file_format = sfinfo.format;
     }
 
     if (resample_sndfile)
