@@ -25,6 +25,7 @@
     - bug github#2 : give delay a 10s range, attack and hold a 15s range,
     				 decay and release a 25s range
     - enh github#5 : logarithmic sliders
+    - enh github#6 : envelopes with exponential slope
 */
 
 
@@ -69,6 +70,7 @@ struct _EnvelopeTabPrivate
     GtkWidget* release;
     GtkWidget* key;
 /*  GtkWidget* vel; - not well implemented */
+    GtkWidget* exp;								// mod1 github#6
 };
 
 
@@ -99,6 +101,7 @@ static void set_sensitive(EnvelopeTabPrivate* p, gboolean val)
     gtk_widget_set_sensitive(p->release, val);
     gtk_widget_set_sensitive(p->key, val);
 /*  gtk_widget_set_sensitive(p->vel, val); */
+    gtk_widget_set_sensitive(p->exp, val);
 }
 
 
@@ -201,6 +204,14 @@ static void vel_cb(PhinSlider* sl, EnvelopeTabPrivate* p)
 }
 */
 
+static void exp_cb(GtkToggleButton* button, EnvelopeTabPrivate* p)
+{
+	patch_set_env_exp(p->patch,
+            id_selector_get_id(ID_SELECTOR(p->idsel)),
+                    gtk_toggle_button_get_active(button));
+}
+
+
 static void connect(EnvelopeTabPrivate* p)
 {
     g_signal_connect(G_OBJECT(p->idsel), "changed",
@@ -225,6 +236,8 @@ static void connect(EnvelopeTabPrivate* p)
                     G_CALLBACK(key_cb), (gpointer) p);
 /*  g_signal_connect(G_OBJECT(p->vel), "value-changed",
                     G_CALLBACK(vel_cb), (gpointer) p); */
+    g_signal_connect(G_OBJECT(p->exp), "toggled",						// mod1 github#6
+                    G_CALLBACK(exp_cb), (gpointer)p);
 }
 
 
@@ -239,6 +252,7 @@ static void block(EnvelopeTabPrivate* p)
     g_signal_handlers_block_by_func(p->release, release_cb, p);
     g_signal_handlers_block_by_func(p->key,     key_cb,     p);
 /*  g_signal_handlers_block_by_func(p->vel,     vel_cb,     p); */
+    g_signal_handlers_block_by_func(p->exp,   	exp_cb,     p);			// mod1 github#6
 }
 
 
@@ -253,6 +267,7 @@ static void unblock(EnvelopeTabPrivate* p)
     g_signal_handlers_unblock_by_func(p->release,   release_cb, p);
     g_signal_handlers_unblock_by_func(p->key,       key_cb,     p);
 /*  g_signal_handlers_unblock_by_func(p->vel,       vel_cb,     p); */
+    g_signal_handlers_unblock_by_func(p->exp,   	exp_cb,     p);		// mod1 github#6
 }
 
 
@@ -350,6 +365,12 @@ static void envelope_tab_init(EnvelopeTab* self)
     ++y;
     */
 
+    /* exp/lin - mod1 github#6 */
+    gui_label_attach("Exponential:", t, a1, a2, y, y + 1);
+    p->exp = gtk_check_button_new();
+    gui_attach(t, p->exp, b1, b2, y, y + 1);
+    ++y;
+
     set_sensitive(p, FALSE);
     connect(p);
 }
@@ -359,6 +380,7 @@ static void update_env(EnvelopeTabPrivate* p)
 {
     int i = p->patch;
     float l, a, h, d, s, r, key;
+    bool exp;
     bool on;
     bool log;
     global_settings* settings = settings_get();
@@ -376,6 +398,7 @@ static void update_env(EnvelopeTabPrivate* p)
     on = patch_get_env_active(i, id);
     key = patch_get_env_key_amt(i, id);
 /*  patch_get_env_vel_amt(i, id, &vel); */
+    exp = patch_get_env_exp(i, id);
 
     block(p);
 
@@ -408,6 +431,8 @@ static void update_env(EnvelopeTabPrivate* p)
 
     phin_slider_set_value(PHIN_SLIDER(p->key), key);
 /*  phin_slider_set_value(PHIN_SLIDER(p->vel), vel); */
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(p->exp), exp);		// mod1 github#6
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(p->env_check), on);
 

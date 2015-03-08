@@ -18,6 +18,7 @@
 
     mod1 / jph
     - enh github#1 read sample loop points
+    - enh github#6 envelopes with exponential slope
 */
 
 
@@ -192,7 +193,7 @@ static int dish_file_write_sample_raw(xmlNodePtr nodeparent, int patch_id)
     const Sample* s = patch_sample_data(patch_id);
     char buf[CHARBUFSIZE];
 
-    if (!(s->raw_samplerate || s->raw_channels || s->sndfile_format))
+    if (!(s->raw_samplerate || s->raw_channels || s->raw_format))
         return 0;
 
     node = xmlNewTextChild(nodeparent, NULL, BAD_CAST "Raw", NULL);
@@ -203,7 +204,7 @@ static int dish_file_write_sample_raw(xmlNodePtr nodeparent, int patch_id)
     snprintf(buf, CHARBUFSIZE, "%d", s->raw_channels);
     xmlNewProp(node, BAD_CAST "channels", BAD_CAST buf);
 
-    snprintf(buf, CHARBUFSIZE, "%d", s->sndfile_format);
+    snprintf(buf, CHARBUFSIZE, "%d", s->raw_format);
     xmlNewProp(node, BAD_CAST "sndfile_format", BAD_CAST buf);
 
     return 0;
@@ -426,6 +427,10 @@ dish_file_write_eg(xmlNodePtr nodeparent, int patch_id, int eg_id)
     val = patch_get_env_key_amt(patch_id, eg_id);
     snprintf(buf, CHARBUFSIZE, "%f", val);
     xmlNewProp(node1,   BAD_CAST "key_tracking",   BAD_CAST buf);
+
+    active = patch_get_env_exp(patch_id, eg_id);					// mod1 github#6
+    xmlNewProp(node1,   BAD_CAST "exponential",
+                        BAD_CAST (active ? "true" : "false"));
 
     return 0;
 }
@@ -1084,6 +1089,9 @@ static int dish_file_read_eg(xmlNodePtr node, int patch_id)
 
     if (get_prop_float(node, "key_tracking", &n))
         patch_set_env_key_amt(patch_id, eg_id, n);
+
+    if ((prop = xmlGetProp(node, BAD_CAST "exponential")))			// mod1 github#6
+        patch_set_env_exp(patch_id, eg_id, xmlstr_to_bool(prop));
 
     return 0;
 }

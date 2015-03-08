@@ -46,10 +46,11 @@ void    mixer_direct_note_off   (int chan, int note,  Tick tick);
 void    mixer_direct_note_on    (int chan, int note,  float vel, Tick tick);
 void    mixer_direct_control    (int chan, int param, float value, Tick tick);
 void    mixer_preview           (char* name,
-        /* zero for non-raw data */ int raw_samplerate,
-        /* zero for non-raw data */ int raw_channels,
-        /* zero for non-raw data */ int sndfile_format,
-                                    int resample_sndfile);
+        /* zero for non-raw data */ int* smp_samplerate,
+        /* zero for non-raw data */ int* smp_channels,
+        /* zero for non-raw data */ int* smp_format,
+                                    int resample_sndfile,
+									int loadwithnosound); // mod1 github#8
 void    mixer_flush_preview     (void);
 
 int     mixer_set_amplitude     (float amplitude);

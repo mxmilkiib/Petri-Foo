@@ -8,6 +8,7 @@ MOD1 in progress... Jean-Pierre Haenlin * https://github.com/jphaenlin/Petri-Foo
 	* enh github#5 : Make EG sliders logarithmic
 	* enh github#6 : Envelopes with exponential slope
 	* bug github#7 : Bad behaviour of envelopes in mono mode without legato
+	* enh github#8 : Display sample characteritics in sample select window
 
 
 2012-08-06 James Morris <james@jwm-art.net>

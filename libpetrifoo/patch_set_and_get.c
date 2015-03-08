@@ -19,6 +19,9 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    mod1 / jph
+    - enh github#6 : envelopes with exponential slope
 */
 
 
@@ -250,6 +253,15 @@ int patch_set_env_key_amt(int patch_id, int eg, float val)
 }
 
 
+int patch_set_env_exp(int patch_id, int eg, bool state)			// mod1 github#6
+{
+    assert(patchok(patch_id));
+    eg = mod_src_to_eg_index(eg);
+    patches[patch_id]->env_params[eg].exp = state;
+    return 0;
+}
+
+
 /**************************************************************************/
 /************************* ENVELOPE GETTERS *******************************/
 /**************************************************************************/
@@ -269,6 +281,7 @@ PATCH_GET_ENV_PARAM( hold,      float )
 PATCH_GET_ENV_PARAM( decay,     float )
 PATCH_GET_ENV_PARAM( sustain,   float )
 PATCH_GET_ENV_PARAM( key_amt,   float )
+PATCH_GET_ENV_PARAM( exp,    	bool  )							// mod1 github#6
 
 /* special cases: */
 float patch_get_env_release (int patch_id, int eg)

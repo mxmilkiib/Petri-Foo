@@ -763,7 +763,7 @@ int gui_init(void)
                                         menu_settings_auto_preview);
     gtk_widget_show(menu_settings_auto_preview);
 
-    /* log sliders github#5 */
+    /* log sliders - mod1 github#5 */
     menu_settings_log_sliders =
         gtk_check_menu_item_new_with_label("Logarithmic sliders");
     gtk_check_menu_item_set_active(

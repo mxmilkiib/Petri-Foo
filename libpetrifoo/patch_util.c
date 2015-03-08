@@ -212,6 +212,7 @@ int patch_create_default(void)
     eg1->attack  = 0.005;
     eg1->release = 0.375;
     eg1->key_amt = -0.99;
+    eg1->exp 	 = false;	// mod1 github#6
 
     /* controllers... */
 
@@ -511,7 +512,7 @@ int patch_sample_load(int id, const char *name,
     return val;
 }
 
-/* not used -jph */
+/* not used (nota jph) */
 int patch_sample_load_from(int dest_id, int src_id)
 {
     int val;
@@ -543,7 +544,7 @@ int patch_sample_load_from(int dest_id, int src_id)
                                 name, patch_samplerate,
                                 patches[src_id]->sample->raw_samplerate,
                                 patches[src_id]->sample->raw_channels,
-                                patches[src_id]->sample->sndfile_format,
+                                patches[src_id]->sample->raw_format,
                                 1);
     patch_unlock(dest_id);
     return val;
@@ -639,7 +640,7 @@ void patch_set_samplerate (int rate)
                 Sample* s = patches[id]->sample;
                 patch_sample_load(id, s->filename,  s->raw_samplerate,
                                                     s->raw_channels,
-                                                    s->sndfile_format,
+                                                    s->raw_format,
                                                     false);	// mod1 github#1
             }
         }

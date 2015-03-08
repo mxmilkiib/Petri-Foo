@@ -52,6 +52,7 @@ void settings_init()
 
     gbl_settings->sample_file_filter = strdup("All Audio files");
     gbl_settings->sample_auto_preview = true;
+    gbl_settings->log_sliders = false;							// mod1 github#5
 
     gbl_settings->filename = (char*) g_build_filename(
                              g_get_user_config_dir(),
