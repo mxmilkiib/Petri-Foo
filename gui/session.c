@@ -17,6 +17,9 @@
 
     You should have received a copy of the GNU General Public License
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
+
+    mod1 / jph
+    - enh github#9 load last bank at startup
 */
 
 #include "session.h"
@@ -41,6 +44,7 @@
 #include "msg_log.h"
 #include "patch_util.h"
 #include "petri-foo.h"
+#include "global_settings.h"
 
 #if HAVE_LIBLO
 #include "nsm.h"
@@ -130,6 +134,7 @@ int session_init(int argc, char* argv[])
     int opt_ix = 0;
     extern int optind;
     struct stat st;
+    global_settings* settings;		// mod1 github#9
 
     static struct option opts[] =
     {
@@ -282,7 +287,9 @@ int session_init(int argc, char* argv[])
             msg_log(MSG_WARNING, "Ignoring bank file option\n");
 
         if (stat(s->bank_path, &st) == 0)
+        {
             dish_file_read(s->bank_path);
+        }
         else
         {
              /* provide default patch if nothing saved in session */
@@ -294,10 +301,20 @@ int session_init(int argc, char* argv[])
     {
         if (optind < argc && stat(argv[optind], &st) == 0)
         {
-            dish_file_read(argv[optind]);
+       	    dish_file_read(argv[optind]);
         }
         else
-            patch_create_default();
+        {
+        	settings = settings_get();							// mod1 github#9
+        	if ( (settings->load_last_bank) && (settings->last_bank != 0) )
+        	{
+        		dish_file_read( settings->last_bank);
+        	}
+        	else
+        	{
+        		patch_create_default();
+        	}
+        }
     }
 
     session_idle_add_event_poll();

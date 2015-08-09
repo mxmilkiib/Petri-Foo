@@ -1,11 +1,12 @@
 Petri-Foo-mod1 : Linux / Jack / MIDI sampler
 
+
 Original program by James Morris
 Based on Specimen, by Pete Bessman
 
 Modifications by Jean-Pierre Haenlin
-- available in spring 2015
-- compatibility with existing patches will be preserved
 - see ChangeLog and TODO files for details
+- compatibility with existing patches is preserved
+
 
 (https://github.com/jphaenlin/Petri-Foo)

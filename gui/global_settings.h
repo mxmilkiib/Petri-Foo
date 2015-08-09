@@ -18,6 +18,7 @@
 
     mod1 / jph
     - enh github#5 logarithmic sliders
+    - enh github#9 load last bank at startup
 */
 
 
@@ -38,6 +39,8 @@ typedef struct global_settings_def
     char*   filename;
     char*   last_sample_dir;
     char*   last_bank_dir;
+    bool	load_last_bank;				// mod1 github#9
+    char*   last_bank;
     int     log_lines;
 
     char*   sample_file_filter;

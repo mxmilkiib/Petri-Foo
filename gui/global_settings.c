@@ -18,6 +18,7 @@
 
     mod1 / jph
     - enh github#5 logarithmic sliders
+    - enh github#9 load last bank at startup
 */
 
 #include <stdlib.h>
@@ -49,6 +50,8 @@ void settings_init()
     gbl_settings  = malloc(sizeof(global_settings));
     gbl_settings->last_sample_dir = strdup(getenv("HOME"));
     gbl_settings->last_bank_dir = strdup(getenv("HOME"));
+    gbl_settings->load_last_bank = false;						// mod1 github#9
+    gbl_settings->last_bank = 0;
 
     gbl_settings->sample_file_filter = strdup("All Audio files");
     gbl_settings->sample_auto_preview = true;
@@ -145,6 +148,19 @@ int settings_read(const char* path)
                 {
                     free(gbl_settings->last_bank_dir);
                     gbl_settings->last_bank_dir =
+                        (char*) xmlGetProp(node2, BAD_CAST "value");
+                }
+
+                if (xmlStrcmp(prop, BAD_CAST "load-last-bank") == 0)		// mod1 github#9
+                {
+                    gbl_settings->load_last_bank =
+                        xmlstr_to_gboolean(xmlGetProp(node2,
+                                                        BAD_CAST "value"));
+                }
+                if (xmlStrcmp(prop, BAD_CAST "last-bank") == 0)
+                {
+                    free(gbl_settings->last_bank);
+                    gbl_settings->last_bank =
                         (char*) xmlGetProp(node2, BAD_CAST "value");
                 }
 
@@ -264,11 +280,19 @@ int settings_write()
     xmlNewProp(node2, BAD_CAST "value",
                       BAD_CAST gbl_settings->last_bank_dir);
 
-    node2 = xmlNewTextChild(node1, NULL, BAD_CAST "property", NULL);
-    xmlNewProp(node2, BAD_CAST "name", BAD_CAST "last-bank-directory");
+    node2 = xmlNewTextChild(node1, NULL, BAD_CAST "property", NULL);	// mod1 github#9
+    xmlNewProp(node2, BAD_CAST "name", BAD_CAST "load-last-bank");
+    xmlNewProp(node2, BAD_CAST "type", BAD_CAST "boolean");
+    xmlNewProp(node2, BAD_CAST "value",
+                      BAD_CAST (gbl_settings->load_last_bank
+                                    ? "true"
+                                    : "false"));
+
+    node2 = xmlNewTextChild(node1, NULL, BAD_CAST "property", NULL);	// mod1 github#9
+    xmlNewProp(node2, BAD_CAST "name", BAD_CAST "last-bank");
     xmlNewProp(node2, BAD_CAST "type", BAD_CAST "string");
     xmlNewProp(node2, BAD_CAST "value",
-                      BAD_CAST gbl_settings->last_bank_dir);
+                      BAD_CAST gbl_settings->last_bank);
 
     node2 = xmlNewTextChild(node1, NULL, BAD_CAST "property", NULL);
     xmlNewProp(node2, BAD_CAST "name", BAD_CAST "log-lines");
@@ -335,6 +359,9 @@ void settings_free(void)
 
     if (gbl_settings->last_bank_dir) 
         free(gbl_settings->last_bank_dir);
+
+    if (gbl_settings->last_bank)
+        free(gbl_settings->last_bank);
 
     if (gbl_settings->sample_file_filter)
         free(gbl_settings->sample_file_filter);
