@@ -6,5 +6,5 @@ make
 to run without installation:
 gui/petri-foo
 
-to install:
+to install (in root) :
 make install

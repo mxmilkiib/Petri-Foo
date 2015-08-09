@@ -23,6 +23,8 @@
     mod1 / jph
     - bug github#4 add a window and taskbar icon
     - enh github#5 logarithmic sliders
+    - enh github#9 load last bank at startup
+    - bug github#10 window's title refresh after bank_save_as
 */
 
 
@@ -91,6 +93,7 @@ static GtkWidget* menu_file_export = 0;
 /* settings */
 static GtkWidget* menu_settings_auto_preview = 0;
 static GtkWidget* menu_settings_log_sliders = 0;
+static GtkWidget* menu_settings_load_last_bank = 0;		// mod1 github#9
 
 /* view */
 static GtkWidget* menu_view_log_display = 0;
@@ -494,6 +497,7 @@ static void cb_menu_file_basic_save_as(GtkWidget * widget, gpointer data)
 {
     (void)widget;(void)data;
     bank_ops_basic_save_as(window);
+    gui_refresh();											// mod1 github#10
 }
 
 static void cb_menu_file_full_save_as(GtkWidget * widget, gpointer data)
@@ -531,6 +535,16 @@ static void cb_menu_settings_log_sliders(GtkWidget* widget, gpointer data)	// mo
     global_settings* settings = settings_get();
     settings->log_sliders = gtk_check_menu_item_get_active(
                         GTK_CHECK_MENU_ITEM(menu_settings_log_sliders));
+    gui_refresh();
+}
+
+
+static void cb_menu_settings_load_last_bank(GtkWidget* widget, gpointer data)	// mod1 github#9
+{
+    (void)widget;(void)data;
+    global_settings* settings = settings_get();
+    settings->load_last_bank = gtk_check_menu_item_get_active(
+                        GTK_CHECK_MENU_ITEM(menu_settings_load_last_bank));
     gui_refresh();
 }
 
@@ -776,6 +790,20 @@ int gui_init(void)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_settings),
     		menu_settings_log_sliders);
     gtk_widget_show(menu_settings_log_sliders);
+
+    /* load last bank - mod1 github#9 */
+    menu_settings_load_last_bank =
+        gtk_check_menu_item_new_with_label("Load last bank at startup");
+    gtk_check_menu_item_set_active(
+        GTK_CHECK_MENU_ITEM(menu_settings_load_last_bank),
+            settings->load_last_bank);
+
+    g_signal_connect(GTK_OBJECT(menu_settings_load_last_bank), "toggled",
+        G_CALLBACK(cb_menu_settings_load_last_bank), NULL);
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu_settings),
+    		menu_settings_load_last_bank);
+    gtk_widget_show(menu_settings_load_last_bank);
 
     /* view menu */
     menu_view = gui_menu_add(menubar, "View", NULL, NULL);

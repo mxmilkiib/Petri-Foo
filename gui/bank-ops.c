@@ -19,6 +19,9 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    mod1 / jph
+    - enh github#9 load last bank at startup
 */
 
 
@@ -141,6 +144,10 @@ static int basic_save_as(GtkWidget* parent_window, gboolean not_export)
             if (recent_manager && not_export)
                 gtk_recent_manager_add_item (recent_manager, 
                     g_filename_to_uri(name, NULL, NULL));
+
+            if (settings->last_bank)
+                free(settings->last_bank);
+            settings->last_bank = strdup(name);							// mod1 github#9
         }
     }
     else
@@ -335,8 +342,10 @@ static int open(GtkWidget* parent_window, gboolean not_import)
 
             if (settings->last_bank_dir)
                 free(settings->last_bank_dir);
-
             settings->last_bank_dir = g_path_get_dirname(name);
+            if (settings->last_bank)
+                free(settings->last_bank);
+            settings->last_bank = strdup(name);							// mod1 github#9
         }
     }
     else
@@ -376,6 +385,9 @@ int bank_ops_import(GtkWidget* parent_window)
 int bank_ops_open_recent(GtkWidget* parent_window, char* filename)
 {
     int val;
+    global_settings* settings = settings_get();
+
+
     assert(!session_is_active());
 
     patch_destroy_all();
@@ -401,6 +413,10 @@ int bank_ops_open_recent(GtkWidget* parent_window, char* filename)
         if (recent_manager)
             gtk_recent_manager_add_item (recent_manager,
                             g_filename_to_uri(filename, NULL, NULL));
+
+        if (settings->last_bank)
+            free(settings->last_bank);
+        settings->last_bank = strdup(filename);							// mod1 github#9
     }
 
     return val;

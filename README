@@ -4,8 +4,8 @@ Original program by James Morris
 Based on Specimen, by Pete Bessman
 
 Modifications by Jean-Pierre Haenlin
-- available in spring 2015
-- compatibility with existing patches will be preserved
+- the program is still in development but usable and stable
+- compatibility with existing patches is preserved
 - see ChangeLog and TODO files for details
 
 (https://github.com/jphaenlin/Petri-Foo)

@@ -1,5 +1,5 @@
 
-MOD1 in progress... Jean-Pierre Haenlin * https://github.com/jphaenlin/Petri-Foo
+MOD1 (in progress...) Jean-Pierre Haenlin * https://github.com/jphaenlin/Petri-Foo
 
 	* enh github#1 : Ability to read loop points in the wav file
 	* bug github#2 : Make EG times longer
@@ -8,8 +8,10 @@ MOD1 in progress... Jean-Pierre Haenlin * https://github.com/jphaenlin/Petri-Foo
 	* enh github#5 : Make EG sliders logarithmic
 	* enh github#6 : Envelopes with exponential slope
 	* bug github#7 : Bad behaviour of envelopes in mono mode without legato
-	* enh github#8 : Display sample characteritics in sample select window
-
+	* enh github#8 : Display sample characteristics in sample select window
+	* enh github#9 : Load last bank at startup
+	* bug github#10: Window's title refresh after bank_save_as
+	
 
 2012-08-06 James Morris <james@jwm-art.net>
 
