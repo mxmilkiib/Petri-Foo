@@ -10,7 +10,7 @@ MOD1 (2015-08-09) Jean-Pierre Haenlin * https://github.com/jphaenlin/Petri-Foo
 	* bug github#7 : Bad behaviour of envelopes in mono mode without legato
 	* enh github#8 : Display sample characteristics in sample select window
 	* enh github#9 : Load last bank at startup
-	* bug github#10: Window's title refresh after bank_save_as 
+	* bug github#10: Window's title refresh after bank_save_as
 	
 
 2012-08-06 James Morris <james@jwm-art.net>
