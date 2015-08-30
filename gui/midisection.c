@@ -21,7 +21,8 @@
     This file is a derivative of a Specimen original, modified 2011
 
     mod1.1 / jph
-    - enh github#11 Ability to have the root note outside of the min/max notes range
+    - enh github#11 Ability to have the root note outside of the min/max notes range,
+    				for drum kits we want range = 1 note, different of root note
 */
 
 
@@ -113,7 +114,7 @@ static gboolean range_cb(GnomeCanvasItem* item, GdkEvent* event,
     int note;
     int lower;
     int upper;
-    gboolean change_range = FALSE;
+    //gboolean change_range = FALSE;
     PatchList* list;
 
     /* a ghetto form of set-insensitive */
@@ -134,7 +135,7 @@ static gboolean range_cb(GnomeCanvasItem* item, GdkEvent* event,
     if (event->button.button == 1)
     {
         lower = clicked;
-        change_range = TRUE;
+        //change_range = TRUE;
     }
     else if (event->button.button == 2)
     {
@@ -143,26 +144,25 @@ static gboolean range_cb(GnomeCanvasItem* item, GdkEvent* event,
     else if (event->button.button == 3)
     {
         upper = clicked;
-        change_range = TRUE;
+        //change_range = TRUE;
     }
 
-    // suppr for mod1.1 github#11, this is not desirable for drum sounds
-    //if (note < lower)
-    //    lower = note;
-    //if (note > upper)
-    //    upper = note;
     if (lower > upper)
     {
         int tmp = lower;
         lower = upper;
         upper = tmp;
     }
-
+    // suppr for mod1.1 github#11
+    //if (note < lower)
+    //    lower = note;
+    //if (note > upper)
+    //    upper = note;
     /* if the range is off, and a range adjusting button wasn't
      * pressed, then clamp the range down to nothing (which will
      * result in it remaining disabled) */
-    if (!change_range && lower == upper)
-        lower = upper = note;
+    //if (!change_range && lower == upper)
+    //    lower = upper = note;
 
     /* reposition note */
     gnome_canvas_item_set(p->note, "x1",
