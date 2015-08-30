@@ -19,6 +19,8 @@
     mod1 / jph
     - enh github#1 read sample loop points
     - enh github#6 envelopes with exponential slope
+    mod1.1 / jph
+    - enh github#11 Ability to have the root note outside of the min/max notes range
 */
 
 
@@ -1013,17 +1015,17 @@ static int dish_file_read_sample(xmlNodePtr node,  int patch_id)
                 msg_log(MSG_WARNING, "swapped lower/upper note values\n");
             }
 
-            if (root < lower)
-            {
-                msg_log(MSG_WARNING,"adjusting root note to lower value\n");
-                root = lower;
-            }
-
-            if (root > upper)
-            {
-                msg_log(MSG_WARNING,"adjusting root note to upper value\n");
-                root = upper;
-            }
+            // suppr for mod1.1 github#11, this is not desirable for drum sounds
+            //if (root < lower)
+            //{
+            //    msg_log(MSG_WARNING,"adjusting root note to lower value\n");
+            //    root = lower;
+            //}
+            //if (root > upper)
+            //{
+            //    msg_log(MSG_WARNING,"adjusting root note to upper value\n");
+            //    root = upper;
+            //}
 
             patch_set_root_note(patch_id, root);
             patch_set_lower_note(patch_id, lower);

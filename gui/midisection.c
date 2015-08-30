@@ -19,6 +19,9 @@
     along with Petri-Foo.  If not, see <http://www.gnu.org/licenses/>.
 
     This file is a derivative of a Specimen original, modified 2011
+
+    mod1.1 / jph
+    - enh github#11 Ability to have the root note outside of the min/max notes range
 */
 
 
@@ -143,12 +146,17 @@ static gboolean range_cb(GnomeCanvasItem* item, GdkEvent* event,
         change_range = TRUE;
     }
 
-    /* clamp the parameters */
-    if (note < lower)
-        lower = note;
-
-    if (note > upper)
-        upper = note;
+    // suppr for mod1.1 github#11, this is not desirable for drum sounds
+    //if (note < lower)
+    //    lower = note;
+    //if (note > upper)
+    //    upper = note;
+    if (lower > upper)
+    {
+        int tmp = lower;
+        lower = upper;
+        upper = tmp;
+    }
 
     /* if the range is off, and a range adjusting button wasn't
      * pressed, then clamp the range down to nothing (which will
@@ -175,7 +183,8 @@ static gboolean range_cb(GnomeCanvasItem* item, GdkEvent* event,
     patch_set_lower_note(p->patch, lower);
     patch_set_upper_note(p->patch, upper);
 
-    if (lower == upper)
+    /* hide the range when it is egal to the root note - mod1.1 github#11 */
+    if ( (lower == upper) && (lower == note) )
         gnome_canvas_item_hide(p->range);
     else
         gnome_canvas_item_show(p->range);
@@ -384,10 +393,12 @@ void midi_section_set_patch(MidiSection* self, int patch)
         gnome_canvas_item_set(p->range, "x2",
                 (gdouble) (upper * PHIN_KEYBOARD_KEY_WIDTH
                                  + PHIN_KEYBOARD_KEY_WIDTH - 1), NULL);
-        if (lower != upper)
-            gnome_canvas_item_show(p->range);
-        else
+
+        /* hide the range when it is egal to the root note - mod1.1 github#11 */
+        if ( (lower == upper) && (lower == note) )
             gnome_canvas_item_hide(p->range);
+        else
+            gnome_canvas_item_show(p->range);
 
         /* scroll the keyboard to show the root note */
         if (p->ignore)

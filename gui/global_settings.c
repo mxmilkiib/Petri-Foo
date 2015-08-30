@@ -360,7 +360,7 @@ void settings_free(void)
     if (gbl_settings->last_bank_dir) 
         free(gbl_settings->last_bank_dir);
 
-    if (gbl_settings->last_bank)
+    if (gbl_settings->last_bank)									// mod1 github#9
         free(gbl_settings->last_bank);
 
     if (gbl_settings->sample_file_filter)
