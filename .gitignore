@@ -43,3 +43,6 @@ Makefile.am
 install_manifest.txt
 
 sandbox/
+/memo.jph
+/.cproject
+/.project
