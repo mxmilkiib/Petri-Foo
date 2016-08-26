@@ -51,6 +51,7 @@ struct _VoiceTabPrivate
 
     GtkWidget* porta_sect;
     GtkWidget* time_sect;
+    GtkWidget* outputgroup_sb;
 };
 
 
@@ -78,6 +79,13 @@ static void cutby_cb(PhinSliderButton* button, VoiceTabPrivate* p)
     patch_set_cut_by(p->patch, val);
 }
 
+static void outputgroup_cb(PhinSliderButton* button, VoiceTabPrivate* p)
+{
+	int val = phin_slider_button_get_value(button);
+	
+	patch_set_output_group(p->patch, val);
+}
+
 
 static void porta_cb(BoolSection* b, VoiceTabPrivate* p)
 {
@@ -102,6 +110,9 @@ static void connect(VoiceTabPrivate* p)
                         G_CALLBACK(cut_cb), (gpointer)p);
     g_signal_connect(G_OBJECT(p->cutby_sb), "value-changed",
                         G_CALLBACK(cutby_cb), (gpointer)p);
+                        
+    g_signal_connect(G_OBJECT(p->outputgroup_sb), "value-changed",
+                        G_CALLBACK(outputgroup_cb), (gpointer)p);
 
     g_signal_connect(G_OBJECT(p->mono_check), "toggled",
                         G_CALLBACK(mono_cb), (gpointer)p);
@@ -115,6 +126,7 @@ static void block(VoiceTabPrivate* p)
 {
     g_signal_handlers_block_by_func(p->cut_sb,      cut_cb,     p);
     g_signal_handlers_block_by_func(p->cutby_sb,    cutby_cb,   p);
+    g_signal_handlers_block_by_func(p->outputgroup_sb,    outputgroup_cb,   p);
     g_signal_handlers_block_by_func(p->mono_check,  mono_cb,    p);
     g_signal_handlers_block_by_func(p->porta_sect,  porta_cb,   p);
 }
@@ -124,6 +136,7 @@ static void unblock(VoiceTabPrivate* p)
 {
     g_signal_handlers_unblock_by_func(p->cut_sb,        cut_cb,     p);
     g_signal_handlers_unblock_by_func(p->cutby_sb,      cutby_cb,   p);
+    g_signal_handlers_unblock_by_func(p->outputgroup_sb, outputgroup_cb,   p);
     g_signal_handlers_unblock_by_func(p->mono_check,    mono_cb,    p);
     g_signal_handlers_unblock_by_func(p->porta_sect,    porta_cb,   p);
 }
@@ -178,6 +191,15 @@ static void voice_tab_init(VoiceTab* self)
     gui_attach(t, p->cutby_sb, b1, b2, y, y + 1);
     ++y;
 
+    /* output group slider button */
+    p->outputgroup_sb = phin_slider_button_new_with_range(0, 0, 16, 1, 0);
+    phin_slider_button_set_format(PHIN_SLIDER_BUTTON(p->outputgroup_sb), 0,
+                                                    "Output Group (0 is ignored):", NULL);
+    phin_slider_button_set_threshold(PHIN_SLIDER_BUTTON(p->outputgroup_sb),
+                                                    GUI_THRESHOLD);
+    gui_attach(t, p->outputgroup_sb, a1, c2, y, y + 1);
+    ++y;
+    
     /* portamento control */
     p->porta_sect = bool_section_new();
     bool_section_set_bool(  BOOL_SECTION(p->porta_sect),
@@ -217,7 +239,7 @@ GtkWidget* voice_tab_new(void)
 void voice_tab_set_patch(VoiceTab* self, int patch)
 {
     VoiceTabPrivate* p = VOICE_TAB_GET_PRIVATE(self);
-    int cut, cutby;
+    int cut, cutby, grp;
     gboolean porta, mono;
 
     p->patch = patch;
@@ -227,6 +249,7 @@ void voice_tab_set_patch(VoiceTab* self, int patch)
 
     cut = patch_get_cut(patch);
     cutby = patch_get_cut_by(patch);
+    grp = patch_get_output_group(patch);
     porta = patch_get_portamento(patch);
     mono = patch_get_monophonic(patch);
 
@@ -234,7 +257,7 @@ void voice_tab_set_patch(VoiceTab* self, int patch)
 
     phin_slider_button_set_value(PHIN_SLIDER_BUTTON(p->cut_sb), cut);
     phin_slider_button_set_value(PHIN_SLIDER_BUTTON(p->cutby_sb), cutby);
-
+    phin_slider_button_set_value(PHIN_SLIDER_BUTTON(p->outputgroup_sb), grp);
     bool_section_set_patch(BOOL_SECTION(p->porta_sect), patch);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(p->mono_check), mono);
