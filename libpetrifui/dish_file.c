@@ -732,6 +732,10 @@ static int dish_write(void)
         /* voice cut by */
         snprintf(buf, CHARBUFSIZE, "%d", patch_get_cut_by(patch_id[i]));
         xmlNewProp(node1,   BAD_CAST "cut_by", BAD_CAST buf);
+        
+        /* output group */
+        snprintf(buf, CHARBUFSIZE, "%d", patch_get_output_group(patch_id[i]));
+        xmlNewProp(node1,   BAD_CAST "output_group", BAD_CAST buf);
 
         /* voice portamento */
         dish_file_write_bool(node1, patch_id[i], PATCH_BOOL_PORTAMENTO);
@@ -1421,6 +1425,9 @@ static int dish_file_read_voice(xmlNodePtr node, int patch_id)
     if (get_prop_int(node, "cut_by", &i))
         patch_set_cut_by(patch_id, i);
 
+    if (get_prop_int(node, "output_group", &i))
+	 patch_set_output_group(patch_id, i);
+	    
     if ((prop = xmlGetProp(node, BAD_CAST "monophonic")))
         patch_set_monophonic(patch_id, xmlstr_to_bool(prop));
 
