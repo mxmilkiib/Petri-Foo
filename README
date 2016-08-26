@@ -7,6 +7,7 @@ Based on Specimen, by Pete Bessman
 Modifications by Jean-Pierre Haenlin
 - see ChangeLog and TODO files for details
 - compatibility with existing patches is preserved
-
-
 (https://github.com/jphaenlin/Petri-Foo)
+
+Multichannel output grouping for patches by sollapse
+http://github.com/sollapse/Petri-Foo
