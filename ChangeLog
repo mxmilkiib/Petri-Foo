@@ -1,3 +1,6 @@
+16chns 2016-08-25  sollapse - https://github.com/sollapse/Petri-Foo
+       + addition of 16 stereo JACK outputs, assignable through patch level output groups.
+       
 MOD1.1 (in progress) Jean-Pierre Haenlin * https://github.com/jphaenlin/Petri-Foo
 
 	* enh github#11: Ability to have the root note outside of the min/max notes range
