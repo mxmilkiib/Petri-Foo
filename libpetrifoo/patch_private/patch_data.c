@@ -68,6 +68,7 @@ Patch* patch_new(void)
 
     p->cut =            0;
     p->cut_by =         0;
+    p->output_group =   0;
 
     p->play_start =     0;
     p->play_stop =      0;

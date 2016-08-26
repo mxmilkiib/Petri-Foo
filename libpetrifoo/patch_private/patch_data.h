@@ -104,6 +104,8 @@ struct _Patch
     int     loop_start;     /* the first frame to loop at */
     int     loop_stop;      /* the last frame to loop at */
     int     sample_stop;    /* very last frame in sample */
+    
+    int     output_group;   /* jack channel patch is played through */
 
     int*    marks[WF_MARK_STOP + 1];
 
