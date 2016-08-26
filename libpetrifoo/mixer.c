@@ -215,7 +215,7 @@ void mixer_set_jack_client(jack_client_t* client)
 
 
 /* mix current soundscape into buf */
-void mixer_mixdown(float *buf, int frames)
+void mixer_mixdown(float *buf, float *grpbuf[], int frames)
 {
     Tick curticks = jack_last_frame_time(jc);
     Event* event = NULL;
@@ -224,9 +224,29 @@ void mixer_mixdown(float *buf, int frames)
     int i;
     int d = 0;
     float logvol = 0.0;
+    float* tmpgrp[16];
 
     for (i = 0; i < frames * 2; i++)
+    {
         buf[i] = 0.0;
+	 grpbuf[0][i] = 0.0;
+	 grpbuf[1][i] = 0.0;
+	 grpbuf[2][i] = 0.0;
+	 grpbuf[3][i] = 0.0;
+	 grpbuf[4][i] = 0.0;
+	 grpbuf[5][i] = 0.0;
+	 grpbuf[6][i] = 0.0;
+	 grpbuf[7][i] = 0.0;
+	 grpbuf[8][i] = 0.0;
+	 grpbuf[9][i] = 0.0;
+	 grpbuf[10][i] = 0.0;
+	 grpbuf[11][i] = 0.0;
+	 grpbuf[12][i] = 0.0;
+	 grpbuf[13][i] = 0.0;
+	 grpbuf[14][i] = 0.0;
+	 grpbuf[15][i] = 0.0;
+     }
+       
 
     /* adjust the ticks in the direct events */
     for (i = 0; i < direct_events_end; ++i)
@@ -260,8 +280,12 @@ void mixer_mixdown(float *buf, int frames)
 
         if (write > 0)
         {
-            patch_render(buf + wrote*2, write);
-            wrote += write;
+	    /* set offset of group buffers with temp array */
+	    for(i = 0; i < 16; i++)
+	        tmpgrp[i] = grpbuf[i] + wrote*2;
+            
+           patch_render(buf + wrote*2, tmpgrp, write);
+           wrote += write;
         }
 
         switch (event->type)
@@ -328,7 +352,13 @@ void mixer_mixdown(float *buf, int frames)
     direct_events_end = 0;
 
     if (wrote < frames)
-        patch_render(buf + wrote*2, frames - wrote);
+    {
+	/* set offset of group buffers with temp array */
+	for(i = 0; i < 16; i++)
+	    tmpgrp[i] = grpbuf[i] + wrote*2;
+	
+        patch_render(buf + wrote*2, tmpgrp, frames - wrote);
+    }
 
     preview_render(buf, frames);
 
@@ -336,7 +366,25 @@ void mixer_mixdown(float *buf, int frames)
     logvol = log_amplitude(amplitude);
 
     for (i = 0; i < frames * 2; i++)
+    {
         buf[i] *= logvol;
+        grpbuf[0][i] *= logvol;
+        grpbuf[1][i] *= logvol;
+        grpbuf[2][i] *= logvol;
+        grpbuf[3][i] *= logvol;
+        grpbuf[4][i] *= logvol;
+        grpbuf[5][i] *= logvol;
+        grpbuf[6][i] *= logvol;
+        grpbuf[7][i] *= logvol;
+        grpbuf[8][i] *= logvol;
+        grpbuf[9][i] *= logvol;
+        grpbuf[10][i] *= logvol;
+        grpbuf[11][i] *= logvol;
+        grpbuf[12][i] *= logvol;
+        grpbuf[13][i] *= logvol;
+        grpbuf[14][i] *= logvol;
+        grpbuf[15][i] *= logvol;
+    }
 }
 
 

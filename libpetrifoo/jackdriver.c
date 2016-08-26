@@ -61,9 +61,13 @@ static jack_port_t*     lport;
 static jack_port_t*     rport;
 static jack_port_t*     midiport;
 
+/* 16 stereo channel ports for jack */
+static jack_port_t*     l_grp_port[16];
+static jack_port_t*     r_grp_port[16];
 
 static jack_client_t*   client = 0;
 static float*           buffer = 0;
+static float*           grp_buffer[16]; /* multichannel buffers */ 
 static int              rate = 44100;
 static int              periodsize = 2048;
 static int              running = 0;
@@ -103,6 +107,14 @@ static int process(jack_nframes_t frames, void* arg)
     size_t i;
     jack_sample_t* l = (jack_sample_t*)jack_port_get_buffer(lport, frames);
     jack_sample_t* r = (jack_sample_t*)jack_port_get_buffer(rport, frames);
+    jack_sample_t* l_grp[16];
+    jack_sample_t* r_grp[16];
+    
+    for(int i = 0; i < 16; i++)
+    {  
+	 l_grp[i] = (jack_sample_t*)jack_port_get_buffer(l_grp_port[i], frames);
+	 r_grp[i] = (jack_sample_t*)jack_port_get_buffer(r_grp_port[i], frames);
+    }
     jack_position_t pos;
 
      /* MIDI data */
@@ -181,11 +193,59 @@ static int process(jack_nframes_t frames, void* arg)
         event_index++;
     }
 
-    mixer_mixdown (buffer, frames);
+    mixer_mixdown (buffer, grp_buffer, frames);
     for (i = 0; i < frames; i++)
     {
         l[i] = buffer[i * 2];
         r[i] = buffer[i * 2 + 1];
+        
+        l_grp[0][i] = grp_buffer[0][i * 2];
+        r_grp[0][i] = grp_buffer[0][i * 2 + 1]; 
+        
+        l_grp[1][i] = grp_buffer[1][i * 2];
+        r_grp[1][i] = grp_buffer[1][i * 2 + 1];
+        
+        l_grp[2][i] = grp_buffer[2][i * 2];
+        r_grp[2][i] = grp_buffer[2][i * 2 + 1]; 
+        
+        l_grp[3][i] = grp_buffer[3][i * 2];
+        r_grp[3][i] = grp_buffer[3][i * 2 + 1];
+        
+        l_grp[4][i] = grp_buffer[4][i * 2];
+        r_grp[4][i] = grp_buffer[4][i * 2 + 1];
+        
+        l_grp[5][i] = grp_buffer[5][i * 2];
+        r_grp[5][i] = grp_buffer[5][i * 2 + 1];
+        
+        l_grp[6][i] = grp_buffer[6][i * 2];
+        r_grp[6][i] = grp_buffer[6][i * 2 + 1]; 
+        
+        l_grp[7][i] = grp_buffer[7][i * 2];
+        r_grp[7][i] = grp_buffer[7][i * 2 + 1];
+        
+        l_grp[8][i] = grp_buffer[8][i * 2];
+        r_grp[8][i] = grp_buffer[8][i * 2 + 1];
+        
+        l_grp[9][i] = grp_buffer[9][i * 2];
+        r_grp[9][i] = grp_buffer[9][i * 2 + 1];
+        
+        l_grp[10][i] = grp_buffer[10][i * 2];
+        r_grp[10][i] = grp_buffer[10][i * 2 + 1];
+        
+        l_grp[11][i] = grp_buffer[11][i * 2];
+        r_grp[11][i] = grp_buffer[11][i * 2 + 1];
+        
+        l_grp[12][i] = grp_buffer[12][i * 2];
+        r_grp[12][i] = grp_buffer[12][i * 2 + 1];      
+		
+	 l_grp[13][i] = grp_buffer[13][i * 2];
+        r_grp[13][i] = grp_buffer[13][i * 2 + 1];
+        
+        l_grp[14][i] = grp_buffer[14][i * 2];
+        r_grp[14][i] = grp_buffer[14][i * 2 + 1];
+        
+        l_grp[15][i] = grp_buffer[15][i * 2];
+        r_grp[15][i] = grp_buffer[15][i * 2 + 1];
     }
 
     return 0;
@@ -204,8 +264,10 @@ static int buffer_size_change(jack_nframes_t b, void* arg)
 {
     (void)arg;
     float* new;
+    float* grp_new[16];
     float* old;
-
+    int i;
+    
     if ((new = malloc(sizeof(float) * b * 2)) == NULL)
     {
         pf_error(PF_ERR_JACK_BUF_SIZE_CHANGE);
@@ -218,6 +280,21 @@ static int buffer_size_change(jack_nframes_t b, void* arg)
     if (old != NULL)
         free (old);
 
+    /*alloc multichannel buffer*/
+    for(i = 0; i < 16; i++)
+    {
+        if ((grp_new[i] = malloc(sizeof(float) * b * 2)) == NULL)
+        {
+	      pf_error(PF_ERR_JACK_BUF_SIZE_CHANGE);
+	      stop();
+	 }
+
+	 old = grp_buffer[i];
+	 grp_buffer[i] = grp_new[i];
+
+	 if (old != NULL)
+	     free (old);
+    } 
     periodsize = b;
 
     /* let the rest of the world know the good news */
@@ -246,6 +323,7 @@ static int start(void)
 {
     const char* instancename = get_instance_name();
     jack_status_t status;
+    int i;
 
     if (!instancename)
         instancename = PACKAGE;
@@ -293,6 +371,7 @@ static int start(void)
 
     jack_on_shutdown(client, shutdown, 0);
 
+    /* master port */
     lport = jack_port_register( client,
                                 "out_left",
                                 JACK_DEFAULT_AUDIO_TYPE,
@@ -304,6 +383,26 @@ static int start(void)
                                 JACK_DEFAULT_AUDIO_TYPE,
                                 JackPortIsOutput,
                                 0);
+                                
+    /* initialize multichannel output */
+    char groupname[16];
+    
+    for(i = 0; i < 16; i++)
+    {
+	 snprintf(groupname, 16, "group[%i]_left", i + 1);
+	 l_grp_port[i] = jack_port_register( client, 
+		                              groupname,
+		                              JACK_DEFAULT_AUDIO_TYPE,
+		                              JackPortIsOutput,
+		                              0);
+
+	 snprintf(groupname, 16, "group[%i]_right", i + 1);
+	 r_grp_port[i] = jack_port_register( client, 
+	                                     groupname,
+		                              JACK_DEFAULT_AUDIO_TYPE,
+		                              JackPortIsOutput,
+		                              0);
+     }
 
     midiport = jack_port_register(  client,
                                     "midi_input",
@@ -326,6 +425,17 @@ static int start(void)
         pthread_mutex_unlock (&running_mutex);
         return -1;
     }
+    
+    for(i = 0; i < 16; i++)
+    {
+	 if ((grp_buffer[i] = malloc (sizeof (float) * periodsize * 2)) == NULL)
+	 {
+		pf_error(PF_ERR_JACK_BUF_ALLOC);
+		jack_client_close (client);
+		pthread_mutex_unlock (&running_mutex);
+		return -1;
+	 }
+     }
 
     mixer_flush();
 
@@ -375,6 +485,7 @@ static int start(void)
 
 static int stop(void)
 {
+    int i;
     debug("stopping jack...\n");
 
     pthread_mutex_lock (&running_mutex);
@@ -389,6 +500,12 @@ static int stop(void)
 
         if (buffer != NULL)
             free (buffer);
+            
+        for(i = 0; i < 16; i++)
+        {
+	     if(grp_buffer[i] != NULL)
+		 free(grp_buffer[i]);
+	 }
     }
 
     running = 0;
