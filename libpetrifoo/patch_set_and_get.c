@@ -416,6 +416,14 @@ int patch_set_legato(int patch_id, bool val)
     return 0;
 }
 
+/*set output channel group*/
+int patch_set_output_group(int patch_id, int group)
+{
+	assert(patchok(patch_id));
+	patches[patch_id]->output_group = group;
+	return 0;
+}
+
 
 int patch_set_fade_samples(int patch_id, int samples)
 {
@@ -743,6 +751,7 @@ int patch_get_##_VAR(int patch_id)  \
 PATCH_GET_VAR( channel )
 PATCH_GET_VAR( cut )
 PATCH_GET_VAR( cut_by )
+PATCH_GET_VAR( output_group )
 PATCH_GET_VAR( display_index )
 PATCH_GET_VAR( root_note )
 PATCH_GET_VAR( lower_note )

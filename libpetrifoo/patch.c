@@ -958,7 +958,7 @@ inline static int advance (Patch* p, PatchVoice* v, int index)
 /*  a helper rountine to render all active voices of
     a given patch into buf
 */
-inline static void patch_render_patch (Patch* p, float* buf, int nframes)
+inline static void patch_render_patch (Patch* p, float* buf, float* grpbuf[], int nframes)
 {
     register int i;
     register int j;
@@ -1026,6 +1026,12 @@ inline static void patch_render_patch (Patch* p, float* buf, int nframes)
             buf[j * 2] += l;
             buf[j * 2 + 1] += r;
 
+	     if(p->output_group > 0 && p->output_group <= 16)
+	     {
+		 grpbuf[p->output_group-1][j * 2] += l;
+		 grpbuf[p->output_group-1][j * 2 + 1] += r;
+	     }
+			
             /* advance our position and stop rendering if we
              * run out of samples */
             if (advance (p, v, j) < 0)
@@ -1084,7 +1090,7 @@ void patch_release_with_id (int id, int note)
 
 
 /* render nframes of all active patches into buf */
-void patch_render (float *buf, int nframes)
+void patch_render (float *buf, float *grpbuf[], int nframes)
 {
     int i;
 
@@ -1104,7 +1110,7 @@ void patch_render (float *buf, int nframes)
                 continue;
             }
 
-            patch_render_patch(patches[i], buf, nframes);
+            patch_render_patch(patches[i], buf, grpbuf, nframes);
             patch_unlock(i);
         }
     }

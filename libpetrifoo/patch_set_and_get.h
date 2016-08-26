@@ -99,6 +99,7 @@ int patch_set_legato    (int patch_id, bool val);
 int patch_set_lower_note(int patch_id, int note);
 int patch_set_lower_vel (int patch_id, int vel);
 int patch_set_upper_vel (int patch_id, int vel);
+int patch_set_output_group (int patch_id, int group);
 
 /* both of these return mark_id on success */
 int patch_set_mark_frame   (int patch_id, int mark_id, int frame);
@@ -138,6 +139,7 @@ bool    patch_get_legato        (int id);
 int     patch_get_lower_note    (int id);
 int     patch_get_lower_vel     (int id);
 int     patch_get_upper_vel     (int id);
+int     patch_get_output_group  (int id);
 
 int     patch_get_mark_frame        (int patch_id, int mark_id);
 int     patch_get_mark_frame_range  (int patch_id, int mark_id,

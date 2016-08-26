@@ -195,7 +195,7 @@ void patch_control_init    (void);
 void patch_control         (int chan, int param, float value);
 void patch_release         (int chan, int note);
 void patch_release_with_id (int id, int note);
-void patch_render          (float* buf, int nframes);
+void patch_render          (float* buf, float* grpbuf[], int nframes);
 void patch_trigger         (int chan, int note, float vel, Tick ticks);
 void patch_trigger_with_id (int id, int note, float vel, Tick ticks);
 
