@@ -293,6 +293,7 @@ void patch_copy(Patch* dest, Patch* src)
     dest->cut =             src->cut;
     dest->cut_by =          src->cut_by;
     dest->cut =             src->cut;
+    dest->output_group =    src->output_group;
     dest->play_start =      src->play_start;
     dest->play_stop =       src->play_stop;
     dest->loop_start =      src->loop_start;
