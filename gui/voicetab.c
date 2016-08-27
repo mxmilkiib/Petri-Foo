@@ -176,7 +176,7 @@ static void voice_tab_init(VoiceTab* self)
     /* cut sliderbutton */
     p->cut_sb = phin_slider_button_new_with_range(0, 0, 99, 1, 0);
     phin_slider_button_set_format(PHIN_SLIDER_BUTTON(p->cut_sb), 0,
-                                                    "Cut:", NULL);
+                                                    "Cut (0 is ignored):", NULL);
     phin_slider_button_set_threshold(PHIN_SLIDER_BUTTON(p->cut_sb),
                                                     GUI_THRESHOLD);
     gui_attach(t, p->cut_sb, a1, a2, y, y + 1);
