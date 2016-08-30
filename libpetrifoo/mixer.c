@@ -221,31 +221,21 @@ void mixer_mixdown(float *buf, float *grpbuf[], int frames)
     Event* event = NULL;
     int wrote = 0;
     int write;
-    int i;
+    int i,j;
     int d = 0;
     float logvol = 0.0;
     float* tmpgrp[16];
 
+    /* group buffer reset */
+    for(j = 0; j < 16; j++)
+    	for(i = 0; i < frames * 2; i++)
+		    grpbuf[j][i] = 0.0;
+	
+	/* master buffer reset */	
     for (i = 0; i < frames * 2; i++)
     {
         buf[i] = 0.0;
-	 grpbuf[0][i] = 0.0;
-	 grpbuf[1][i] = 0.0;
-	 grpbuf[2][i] = 0.0;
-	 grpbuf[3][i] = 0.0;
-	 grpbuf[4][i] = 0.0;
-	 grpbuf[5][i] = 0.0;
-	 grpbuf[6][i] = 0.0;
-	 grpbuf[7][i] = 0.0;
-	 grpbuf[8][i] = 0.0;
-	 grpbuf[9][i] = 0.0;
-	 grpbuf[10][i] = 0.0;
-	 grpbuf[11][i] = 0.0;
-	 grpbuf[12][i] = 0.0;
-	 grpbuf[13][i] = 0.0;
-	 grpbuf[14][i] = 0.0;
-	 grpbuf[15][i] = 0.0;
-     }
+	}
        
 
     /* adjust the ticks in the direct events */
@@ -365,10 +355,14 @@ void mixer_mixdown(float *buf, float *grpbuf[], int frames)
     /* scale to master amplitude */
     logvol = log_amplitude(amplitude);
 
-    for (i = 0; i < frames * 2; i++)
+    for(j = 0; j < 16; j++)
+        for(i = 0; i < frames * 2; i++)
+            grpbuf[j][i] *= logvol;
+            
+    for(i = 0; i < frames * 2; i++)
     {
         buf[i] *= logvol;
-        grpbuf[0][i] *= logvol;
+        /*grpbuf[0][i] *= logvol;
         grpbuf[1][i] *= logvol;
         grpbuf[2][i] *= logvol;
         grpbuf[3][i] *= logvol;
@@ -383,7 +377,7 @@ void mixer_mixdown(float *buf, float *grpbuf[], int frames)
         grpbuf[12][i] *= logvol;
         grpbuf[13][i] *= logvol;
         grpbuf[14][i] *= logvol;
-        grpbuf[15][i] *= logvol;
+        grpbuf[15][i] *= logvol;*/
     }
 }
 

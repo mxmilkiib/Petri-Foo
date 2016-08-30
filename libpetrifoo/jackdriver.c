@@ -194,59 +194,24 @@ static int process(jack_nframes_t frames, void* arg)
     }
 
     mixer_mixdown (buffer, grp_buffer, frames);
-    for (i = 0; i < frames; i++)
+    
+    int j;
+    
+    for(j = 0; j < 16; j++)
+    {
+		for(i = 0; i < frames; i++)
+		{
+		   l_grp[j][i] = grp_buffer[j][i * 2];
+           r_grp[j][i] = grp_buffer[j][i * 2 + 1];
+		}
+		
+	}
+	
+    for(i = 0; i < frames; i++)
     {
         l[i] = buffer[i * 2];
         r[i] = buffer[i * 2 + 1];
-        
-        l_grp[0][i] = grp_buffer[0][i * 2];
-        r_grp[0][i] = grp_buffer[0][i * 2 + 1]; 
-        
-        l_grp[1][i] = grp_buffer[1][i * 2];
-        r_grp[1][i] = grp_buffer[1][i * 2 + 1];
-        
-        l_grp[2][i] = grp_buffer[2][i * 2];
-        r_grp[2][i] = grp_buffer[2][i * 2 + 1]; 
-        
-        l_grp[3][i] = grp_buffer[3][i * 2];
-        r_grp[3][i] = grp_buffer[3][i * 2 + 1];
-        
-        l_grp[4][i] = grp_buffer[4][i * 2];
-        r_grp[4][i] = grp_buffer[4][i * 2 + 1];
-        
-        l_grp[5][i] = grp_buffer[5][i * 2];
-        r_grp[5][i] = grp_buffer[5][i * 2 + 1];
-        
-        l_grp[6][i] = grp_buffer[6][i * 2];
-        r_grp[6][i] = grp_buffer[6][i * 2 + 1]; 
-        
-        l_grp[7][i] = grp_buffer[7][i * 2];
-        r_grp[7][i] = grp_buffer[7][i * 2 + 1];
-        
-        l_grp[8][i] = grp_buffer[8][i * 2];
-        r_grp[8][i] = grp_buffer[8][i * 2 + 1];
-        
-        l_grp[9][i] = grp_buffer[9][i * 2];
-        r_grp[9][i] = grp_buffer[9][i * 2 + 1];
-        
-        l_grp[10][i] = grp_buffer[10][i * 2];
-        r_grp[10][i] = grp_buffer[10][i * 2 + 1];
-        
-        l_grp[11][i] = grp_buffer[11][i * 2];
-        r_grp[11][i] = grp_buffer[11][i * 2 + 1];
-        
-        l_grp[12][i] = grp_buffer[12][i * 2];
-        r_grp[12][i] = grp_buffer[12][i * 2 + 1];      
-		
-	 l_grp[13][i] = grp_buffer[13][i * 2];
-        r_grp[13][i] = grp_buffer[13][i * 2 + 1];
-        
-        l_grp[14][i] = grp_buffer[14][i * 2];
-        r_grp[14][i] = grp_buffer[14][i * 2 + 1];
-        
-        l_grp[15][i] = grp_buffer[15][i * 2];
-        r_grp[15][i] = grp_buffer[15][i * 2 + 1];
-    }
+    }     
 
     return 0;
 }
