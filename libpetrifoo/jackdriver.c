@@ -199,14 +199,15 @@ static int process(jack_nframes_t frames, void* arg)
     
     for(j = 0; j < 16; j++)
     {
-		for(i = 0; i < frames; i++)
-		{
-		   l_grp[j][i] = grp_buffer[j][i * 2];
+        for(i = 0; i < frames; i++)
+	{
+	   l_grp[j][i] = grp_buffer[j][i * 2];
            r_grp[j][i] = grp_buffer[j][i * 2 + 1];
-		}
-		
 	}
+		
+    }
 	
+    /* process main out */	
     for(i = 0; i < frames; i++)
     {
         l[i] = buffer[i * 2];
