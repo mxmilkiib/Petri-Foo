@@ -354,30 +354,16 @@ void mixer_mixdown(float *buf, float *grpbuf[], int frames)
 
     /* scale to master amplitude */
     logvol = log_amplitude(amplitude);
-
+    
+    /* process output group buffers */
     for(j = 0; j < 16; j++)
         for(i = 0; i < frames * 2; i++)
             grpbuf[j][i] *= logvol;
-            
+    
+    /* process main out buffer */        
     for(i = 0; i < frames * 2; i++)
     {
         buf[i] *= logvol;
-        /*grpbuf[0][i] *= logvol;
-        grpbuf[1][i] *= logvol;
-        grpbuf[2][i] *= logvol;
-        grpbuf[3][i] *= logvol;
-        grpbuf[4][i] *= logvol;
-        grpbuf[5][i] *= logvol;
-        grpbuf[6][i] *= logvol;
-        grpbuf[7][i] *= logvol;
-        grpbuf[8][i] *= logvol;
-        grpbuf[9][i] *= logvol;
-        grpbuf[10][i] *= logvol;
-        grpbuf[11][i] *= logvol;
-        grpbuf[12][i] *= logvol;
-        grpbuf[13][i] *= logvol;
-        grpbuf[14][i] *= logvol;
-        grpbuf[15][i] *= logvol;*/
     }
 }
 
