@@ -1,3 +1,7 @@
+multichn 2016-09-03  sollapse - https://github.com/sollapse/Petri-Foo
+       + Made multichannel output arbitrary by creating command line switch for settting of max output groups. 
+       + Output groups are saved in global settings xml file.
+       
 multichn 2016-08-30  sollapse - https://github.com/sollapse/Petri-Foo
        + addition of 16 [default] stereo JACK outputs, assignable through patch level output groups.
        
