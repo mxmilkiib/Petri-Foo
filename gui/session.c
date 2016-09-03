@@ -142,6 +142,7 @@ int session_init(int argc, char* argv[])
         { "jack-name",      1, 0, 'j'},
         { "unconnected",    0, 0, 'u'},
         { "uuid",           1, 0, 'U'},
+        { "outputgroups",   1, 0, 'o'},
         { 0, 0, 0, 0}
     };
 
@@ -159,7 +160,7 @@ int session_init(int argc, char* argv[])
     s->state = SESSION_STATE_CLOSED;
     s->bank_path = 0;
 
-    while((opt = getopt_long(argc, argv, "aj:uU:", opts, &opt_ix)) > 0)
+    while((opt = getopt_long(argc, argv, "aj:uU:o:", opts, &opt_ix)) > 0)
     {
         switch (opt)
         {
@@ -199,6 +200,18 @@ int session_init(int argc, char* argv[])
             }
             else msg_log(MSG_WARNING, "Ignoring --uuid option\n");
             break;
+         
+         case 'o':
+            if (!nsm_url)
+            {
+                msg_log(MSG_MESSAGE, "Setting up %i output groups for patches and JACK\n",
+                                    atoi(optarg));
+                settings = settings_get();
+                settings->output_groups = atoi(optarg);
+            }
+            else msg_log(MSG_WARNING, "Ignoring --outputgroups option\n");
+            break;
+            
 
         default:
             msg_log(MSG_WARNING, "Ignoring unknown option '--%s'\n",
@@ -207,6 +220,10 @@ int session_init(int argc, char* argv[])
     }
 
     debug("Initializing session support data\n");
+    
+    /* set output group channels */
+    settings = settings_get();
+    jackdriver_set_outputgroup(settings->output_groups);
 
     #if HAVE_LIBLO
     s->nsm_client = 0;

@@ -46,6 +46,7 @@ typedef struct global_settings_def
     char*   sample_file_filter;
     bool    sample_auto_preview;
     bool	log_sliders;				// mod1 github#5
+    int     output_groups;              //multichannel
 } global_settings;
 
 

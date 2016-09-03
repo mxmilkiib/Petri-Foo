@@ -25,12 +25,13 @@
 #include <gtk/gtk.h>
 
 #include "phin.h"
-
+#include "jackdriver.h"
 #include "voicetab.h"
 #include "gui.h"
 #include "patch_set_and_get.h"
 #include "bool_section.h"
 #include "float_section.h"
+#include "global_settings.h"
 
 
 typedef struct _VoiceTabPrivate VoiceTabPrivate;
@@ -148,6 +149,7 @@ static void voice_tab_init(VoiceTab* self)
     GtkBox* box = GTK_BOX(self);
     GtkWidget* table;
     GtkTable* t;
+    global_settings* s = settings_get();
 
     int a1 = 0,     a2 = 1;
     int b1 = 1,     b2 = 2;
@@ -192,7 +194,7 @@ static void voice_tab_init(VoiceTab* self)
     ++y;
 
     /* output group slider button */
-    p->outputgroup_sb = phin_slider_button_new_with_range(0, 0, 16, 1, 0);
+    p->outputgroup_sb = phin_slider_button_new_with_range(0, 0, s->output_groups, 1, 0);
     phin_slider_button_set_format(PHIN_SLIDER_BUTTON(p->outputgroup_sb), 0,
                                                     "Output Group (0 is ignored):", NULL);
     phin_slider_button_set_threshold(PHIN_SLIDER_BUTTON(p->outputgroup_sb),

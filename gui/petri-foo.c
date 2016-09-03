@@ -52,14 +52,16 @@ void show_usage (void)
     printf("(Bank files use .petri-foo extension)\n\n");
 
     printf ("Options:\n");
-    printf("  -a, --autoconnect         Auto-connect through JACK to "
-                                        "system playback ports\n");
-    printf("  -j, --jack-name <name>    Specify JACK client name, "
-                                        "defaults to \"Petri-Foo\"\n" );
-    printf("  -u, --unconnected         Don't auto-connect to JACK system "
-                                        "playback ports (deprecated)\n");
-    printf("  -U, --uuid <uuid>         Set UUID for JACK session\n");
-    printf("  -h, --help                Display this help message\n\n");
+    printf("  -a, --autoconnect             Auto-connect through JACK to "
+                                            "system playback ports\n");
+    printf("  -o, --outputgroups <groups>   Number of patch output groups (channels) to create"
+                                           "with corresponding JACK ports (default is 16)\n");
+    printf("  -j, --jack-name <name>        Specify JACK client name, "
+                                           "defaults to \"Petri-Foo\"\n" );
+    printf("  -u, --unconnected             Don't auto-connect to JACK system "
+                                           "playback ports (deprecated)\n");
+    printf("  -U, --uuid <uuid>             Set UUID for JACK session\n");
+    printf("  -h, --help                    Display this help message\n\n");
     printf("For more information, please see:"
             "http://petri-foo.sourceforge.net/\n");
 }

@@ -34,7 +34,7 @@
 #include "petri-foo.h"
 #include "msg_log.h"
 #include "sync.h"
-
+#include "../libpetrifoo/jackdriver.h"
 
 #define SETTINGS_BASENAME "rc.xml"
 
@@ -64,6 +64,7 @@ void settings_init()
                              NULL);
 
     gbl_settings->log_lines =           DEFAULT_LOG_LINES;
+    gbl_settings->output_groups = MAX_JACK_CHANNELS;
 /*
     gbl_settings->abs_max_sample_size = DEFAULT_ABS_MAX_SAMPLE;
     gbl_settings->max_sample_size =     DEFAULT_MAX_SAMPLE;
@@ -205,6 +206,11 @@ int settings_read(const char* path)
                         xmlstr_to_gboolean(xmlGetProp(node2,
                                                         BAD_CAST "value"));
                 }
+                if (xmlStrcmp(prop, BAD_CAST "output-groups") == 0)		// multichannel
+                {
+                    gbl_settings->output_groups = atoi(xmlGetProp(node2,
+                                                        BAD_CAST "value"));
+                }
             }
         }
     }
@@ -330,6 +336,12 @@ int settings_write()
                       BAD_CAST (gbl_settings->log_sliders
                                     ? "true"
                                     : "false"));
+                                    
+    node2 = xmlNewTextChild(node1, NULL, BAD_CAST "property", NULL);                                
+    xmlNewProp(node2, BAD_CAST "name", BAD_CAST "output-groups");
+    xmlNewProp(node2, BAD_CAST "type", BAD_CAST "int");
+    snprintf(buf, CHARBUFSIZE, "%i", gbl_settings->output_groups);
+    xmlNewProp(node2, BAD_CAST "value", BAD_CAST buf);
 
     debug("attempting to write file:%s\n",gbl_settings->filename);
 
