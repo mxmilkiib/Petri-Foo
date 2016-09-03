@@ -215,7 +215,7 @@ void mixer_set_jack_client(jack_client_t* client)
 
 
 /* mix current soundscape into buf */
-void mixer_mixdown(float *buf, float *grpbuf[], int frames)
+void mixer_mixdown(float *buf, float **grpbuf, int frames, int outgrps)
 {
     Tick curticks = jack_last_frame_time(jc);
     Event* event = NULL;
@@ -224,17 +224,17 @@ void mixer_mixdown(float *buf, float *grpbuf[], int frames)
     int i,j;
     int d = 0;
     float logvol = 0.0;
-    float* tmpgrp[16];
+    float* tmpgrp[outgrps];
 
     /* group buffer reset */
-    for(j = 0; j < 16; j++)
+    for(j = 0; j < outgrps; j++)
     	for(i = 0; i < frames * 2; i++)
-		    grpbuf[j][i] = 0.0;
+		    grpbuf[j][i] = 0.0f;
 	
 	/* master buffer reset */	
     for (i = 0; i < frames * 2; i++)
     {
-        buf[i] = 0.0;
+        buf[i] = 0.0f;
 	}
        
 
@@ -271,10 +271,10 @@ void mixer_mixdown(float *buf, float *grpbuf[], int frames)
         if (write > 0)
         {
 	    /* set offset of group buffers with temp array */
-	    for(i = 0; i < 16; i++)
+	    for(i = 0; i < outgrps; i++)
 	        tmpgrp[i] = grpbuf[i] + wrote*2;
             
-           patch_render(buf + wrote*2, tmpgrp, write);
+           patch_render(buf + wrote*2, tmpgrp, write, outgrps);
            wrote += write;
         }
 
@@ -344,27 +344,24 @@ void mixer_mixdown(float *buf, float *grpbuf[], int frames)
     if (wrote < frames)
     {
 	/* set offset of group buffers with temp array */
-	for(i = 0; i < 16; i++)
+	for(i = 0; i < outgrps; i++)
 	    tmpgrp[i] = grpbuf[i] + wrote*2;
 	
-        patch_render(buf + wrote*2, tmpgrp, frames - wrote);
+        patch_render(buf + wrote*2, tmpgrp, frames - wrote, outgrps);
     }
 
     preview_render(buf, frames);
 
     /* scale to master amplitude */
     logvol = log_amplitude(amplitude);
-    
-    /* process output group buffers */
-    for(j = 0; j < 16; j++)
+
+    for(j = 0; j < outgrps; j++)
         for(i = 0; i < frames * 2; i++)
             grpbuf[j][i] *= logvol;
-    
-    /* process main out buffer */        
+            
     for(i = 0; i < frames * 2; i++)
-    {
         buf[i] *= logvol;
-    }
+       
 }
 
 

@@ -21,7 +21,6 @@
     This file is a derivative of a Specimen original, modified 2011
 */
 
-
 #ifndef __JACKDRIVER_H__
 #define __JACKDRIVER_H__
 
@@ -35,8 +34,10 @@
 void jackdriver_set_session_cb(JackSessionCallback jacksession_cb);
 #endif
 
+static int MAX_JACK_CHANNELS = 16;
 void            jackdriver_set_autoconnect(bool);
 void            jackdriver_set_uuid(char *uuid);
+void            jackdriver_set_outputgroup(int o);
 jack_client_t*  jackdriver_get_client(void);
 
 /*  if this needs to be called do so before starting jack */

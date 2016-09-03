@@ -48,6 +48,14 @@
 #include "lfo.h"
 #include "midi_control.h"
 
+
+/* working together to stop CTS */
+typedef jack_default_audio_sample_t jack_sample_t;
+
+
+#if HAVE_JACK_SESSION_H
+JackSessionCallback session_cb = 0;
+
 /* prototypes */
 static int start(void);
 static int stop(void);
@@ -61,18 +69,25 @@ static jack_port_t*     lport;
 static jack_port_t*     rport;
 static jack_port_t*     midiport;
 
-/* 16 stereo channel ports for jack */
-static jack_port_t*     l_grp_port[16];
-static jack_port_t*     r_grp_port[16];
+/* output group channel ports for jack */
+static jack_port_t**     l_grp_port;
+static jack_port_t**     r_grp_port;
+
+/* port buffers */
+static jack_sample_t* l;
+static jack_sample_t* r;
+static jack_sample_t** l_grp;
+static jack_sample_t** r_grp;
 
 static jack_client_t*   client = 0;
 static float*           buffer = 0;
-static float*           grp_buffer[16]; /* multichannel buffers */ 
+static float**          grp_buffer = 0; /* multichannel buffers */ 
 static int              rate = 44100;
 static int              periodsize = 2048;
 static int              running = 0;
 static pthread_mutex_t  running_mutex = PTHREAD_MUTEX_INITIALIZER;
 static char*            session_uuid = NULL;
+static int i, j;
 
 static bool             autoconnect = false;
 
@@ -82,12 +97,10 @@ static bool             disable_jacksession = false;
 static bool             disable_jacksession = true;
 #endif
 
-/* working together to stop CTS */
-typedef jack_default_audio_sample_t jack_sample_t;
-
-
-#if HAVE_JACK_SESSION_H
-JackSessionCallback session_cb = 0;
+void jackdriver_set_outputgroup(int o)
+{
+     MAX_JACK_CHANNELS = o;	
+}
 
 void jackdriver_set_session_cb(JackSessionCallback jack_session_cb)
 {
@@ -104,17 +117,15 @@ void jackdriver_disable_jacksession(void)
 static int process(jack_nframes_t frames, void* arg)
 {
     (void)arg;
-    size_t i;
-    jack_sample_t* l = (jack_sample_t*)jack_port_get_buffer(lport, frames);
-    jack_sample_t* r = (jack_sample_t*)jack_port_get_buffer(rport, frames);
-    jack_sample_t* l_grp[16];
-    jack_sample_t* r_grp[16];
-    
-    for(int i = 0; i < 16; i++)
+    l = (jack_sample_t*)jack_port_get_buffer(lport, frames);
+    r = (jack_sample_t*)jack_port_get_buffer(rport, frames);
+        
+    for(int i = 0; i < MAX_JACK_CHANNELS; i++)
     {  
-	 l_grp[i] = (jack_sample_t*)jack_port_get_buffer(l_grp_port[i], frames);
-	 r_grp[i] = (jack_sample_t*)jack_port_get_buffer(r_grp_port[i], frames);
+	    l_grp[i] = (jack_sample_t*)jack_port_get_buffer(l_grp_port[i], frames);
+	    r_grp[i] = (jack_sample_t*)jack_port_get_buffer(r_grp_port[i], frames);
     }
+    
     jack_position_t pos;
 
      /* MIDI data */
@@ -193,21 +204,21 @@ static int process(jack_nframes_t frames, void* arg)
         event_index++;
     }
 
-    mixer_mixdown (buffer, grp_buffer, frames);
+    mixer_mixdown (buffer, grp_buffer, frames, MAX_JACK_CHANNELS);
     
-    int j;
+       
+    /* Output audio to channels */
     
-    for(j = 0; j < 16; j++)
+    for(j = 0; j < MAX_JACK_CHANNELS; j++)
     {
-        for(i = 0; i < frames; i++)
-	{
-	   l_grp[j][i] = grp_buffer[j][i * 2];
+		for(i = 0; i < frames; i++)
+		{
+		   l_grp[j][i] = grp_buffer[j][i * 2];
            r_grp[j][i] = grp_buffer[j][i * 2 + 1];
-	}
+		}
 		
-    }
+	}
 	
-    /* process main out */	
     for(i = 0; i < frames; i++)
     {
         l[i] = buffer[i * 2];
@@ -229,11 +240,9 @@ static int sample_rate_change(jack_nframes_t r, void* arg)
 static int buffer_size_change(jack_nframes_t b, void* arg)
 {
     (void)arg;
-    float* new;
-    float* grp_new[16];
-    float* old;
-    int i;
-    
+    float* new, *old;
+    float** grp_new;
+               
     if ((new = malloc(sizeof(float) * b * 2)) == NULL)
     {
         pf_error(PF_ERR_JACK_BUF_SIZE_CHANGE);
@@ -246,21 +255,27 @@ static int buffer_size_change(jack_nframes_t b, void* arg)
     if (old != NULL)
         free (old);
 
+    grp_new = malloc(MAX_JACK_CHANNELS * sizeof(float*));
+      
     /*alloc multichannel buffer*/
-    for(i = 0; i < 16; i++)
+    for(i = 0; i < MAX_JACK_CHANNELS; i++)
     {
-        if ((grp_new[i] = malloc(sizeof(float) * b * 2)) == NULL)
-        {
-	      pf_error(PF_ERR_JACK_BUF_SIZE_CHANGE);
-	      stop();
-	 }
-
-	 old = grp_buffer[i];
-	 grp_buffer[i] = grp_new[i];
-
-	 if (old != NULL)
-	     free (old);
-    } 
+	    if ((grp_new[i] = malloc (sizeof (float) * periodsize * 2)) == NULL)
+	    {
+		    pf_error(PF_ERR_JACK_BUF_SIZE_CHANGE);
+	        stop();
+	    }
+	   
+	    if(grp_buffer[i] != NULL)
+	       free(grp_buffer[i]);
+	    
+	}
+     
+    if(grp_buffer != NULL)
+	   free(grp_buffer);
+	       
+	grp_buffer = grp_new; 
+     
     periodsize = b;
 
     /* let the rest of the world know the good news */
@@ -289,8 +304,7 @@ static int start(void)
 {
     const char* instancename = get_instance_name();
     jack_status_t status;
-    int i;
-
+    
     if (!instancename)
         instancename = PACKAGE;
 
@@ -352,23 +366,25 @@ static int start(void)
                                 
     /* initialize multichannel output */
     char groupname[16];
-    
-    for(i = 0; i < 16; i++)
+    l_grp_port = malloc(MAX_JACK_CHANNELS * sizeof(jack_sample_t*));
+    r_grp_port = malloc(MAX_JACK_CHANNELS * sizeof(jack_sample_t*));
+	
+    for(i = 0; i < MAX_JACK_CHANNELS; i++)
     {
-	 snprintf(groupname, 16, "group[%i]_left", i + 1);
-	 l_grp_port[i] = jack_port_register( client, 
-		                              groupname,
-		                              JACK_DEFAULT_AUDIO_TYPE,
-		                              JackPortIsOutput,
-		                              0);
+	    snprintf(groupname, 16, "group %i_left", i + 1);
+	    l_grp_port[i] = jack_port_register( client, 
+		                                    groupname,
+		                                    JACK_DEFAULT_AUDIO_TYPE,
+		                                    JackPortIsOutput,
+		                                    0);
 
-	 snprintf(groupname, 16, "group[%i]_right", i + 1);
-	 r_grp_port[i] = jack_port_register( client, 
-	                                     groupname,
-		                              JACK_DEFAULT_AUDIO_TYPE,
-		                              JackPortIsOutput,
-		                              0);
-     }
+  	    snprintf(groupname, 16, "group %i_right", i + 1);
+	    r_grp_port[i] = jack_port_register( client, 
+	                                        groupname,
+		                                    JACK_DEFAULT_AUDIO_TYPE,
+		                                    JackPortIsOutput,
+		                                    0);
+    }
 
     midiport = jack_port_register(  client,
                                     "midi_input",
@@ -392,16 +408,20 @@ static int start(void)
         return -1;
     }
     
-    for(i = 0; i < 16; i++)
+    grp_buffer = malloc(MAX_JACK_CHANNELS * sizeof(float*));
+    l_grp = malloc(MAX_JACK_CHANNELS * sizeof(jack_sample_t*));
+    r_grp = malloc(MAX_JACK_CHANNELS * sizeof(jack_sample_t*));
+    
+    for(i = 0; i < MAX_JACK_CHANNELS; i++)
     {
-	 if ((grp_buffer[i] = malloc (sizeof (float) * periodsize * 2)) == NULL)
-	 {
-		pf_error(PF_ERR_JACK_BUF_ALLOC);
-		jack_client_close (client);
-		pthread_mutex_unlock (&running_mutex);
-		return -1;
-	 }
-     }
+	    if ((grp_buffer[i] = malloc (sizeof (float) * periodsize * 2)) == NULL)
+	    {
+		    pf_error(PF_ERR_JACK_BUF_ALLOC);
+		    jack_client_close (client);
+	 	    pthread_mutex_unlock (&running_mutex);
+		    return -1;
+	    }
+	}
 
     mixer_flush();
 
@@ -467,11 +487,12 @@ static int stop(void)
         if (buffer != NULL)
             free (buffer);
             
-        for(i = 0; i < 16; i++)
+        for(i = 0; i < MAX_JACK_CHANNELS; i++)
         {
-	     if(grp_buffer[i] != NULL)
-		 free(grp_buffer[i]);
-	 }
+	        if(grp_buffer[i] != NULL)
+		       free(grp_buffer[i]);
+	    }
+	    free(grp_buffer);
     }
 
     running = 0;

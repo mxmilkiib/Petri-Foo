@@ -958,7 +958,7 @@ inline static int advance (Patch* p, PatchVoice* v, int index)
 /*  a helper rountine to render all active voices of
     a given patch into buf
 */
-inline static void patch_render_patch (Patch* p, float* buf, float* grpbuf[], int nframes)
+inline static void patch_render_patch (Patch* p, float* buf, float** grpbuf, int nframes, int outgrps)
 {
     register int i;
     register int j;
@@ -1026,7 +1026,7 @@ inline static void patch_render_patch (Patch* p, float* buf, float* grpbuf[], in
             buf[j * 2] += l;
             buf[j * 2 + 1] += r;
 
-	     if(p->output_group > 0 && p->output_group <= 16)
+	     if(p->output_group > 0 && p->output_group <= outgrps)
 	     {
 		 grpbuf[p->output_group-1][j * 2] += l;
 		 grpbuf[p->output_group-1][j * 2 + 1] += r;
@@ -1090,7 +1090,7 @@ void patch_release_with_id (int id, int note)
 
 
 /* render nframes of all active patches into buf */
-void patch_render (float *buf, float *grpbuf[], int nframes)
+void patch_render (float *buf, float **grpbuf, int nframes, int outgrps)
 {
     int i;
 
@@ -1110,7 +1110,7 @@ void patch_render (float *buf, float *grpbuf[], int nframes)
                 continue;
             }
 
-            patch_render_patch(patches[i], buf, grpbuf, nframes);
+            patch_render_patch(patches[i], buf, grpbuf, nframes, outgrps);
             patch_unlock(i);
         }
     }
