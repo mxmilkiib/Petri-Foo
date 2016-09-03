@@ -1426,7 +1426,7 @@ static int dish_file_read_voice(xmlNodePtr node, int patch_id)
         patch_set_cut_by(patch_id, i);
 
     if (get_prop_int(node, "output_group", &i))
-	 patch_set_output_group(patch_id, i);
+	    patch_set_output_group(patch_id, i);
 	    
     if ((prop = xmlGetProp(node, BAD_CAST "monophonic")))
         patch_set_monophonic(patch_id, xmlstr_to_bool(prop));
