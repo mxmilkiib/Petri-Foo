@@ -122,8 +122,8 @@ static int process(jack_nframes_t frames, void* arg)
         
     for(int i = 0; i < MAX_JACK_CHANNELS; i++)
     {  
-	    l_grp[i] = (jack_sample_t*)jack_port_get_buffer(l_grp_port[i], frames);
-	    r_grp[i] = (jack_sample_t*)jack_port_get_buffer(r_grp_port[i], frames);
+	l_grp[i] = (jack_sample_t*)jack_port_get_buffer(l_grp_port[i], frames);
+	r_grp[i] = (jack_sample_t*)jack_port_get_buffer(r_grp_port[i], frames);
     }
     
     jack_position_t pos;
@@ -211,13 +211,14 @@ static int process(jack_nframes_t frames, void* arg)
     
     for(j = 0; j < MAX_JACK_CHANNELS; j++)
     {
-		for(i = 0; i < frames; i++)
-		{
-		   l_grp[j][i] = grp_buffer[j][i * 2];
-           r_grp[j][i] = grp_buffer[j][i * 2 + 1];
-		}
-		
+
+        for(i = 0; i < frames; i++)
+	{
+            l_grp[j][i] = grp_buffer[j][i * 2];
+            r_grp[j][i] = grp_buffer[j][i * 2 + 1];
 	}
+		
+    }
 	
     for(i = 0; i < frames; i++)
     {
@@ -260,21 +261,21 @@ static int buffer_size_change(jack_nframes_t b, void* arg)
     /*alloc multichannel buffer*/
     for(i = 0; i < MAX_JACK_CHANNELS; i++)
     {
-	    if ((grp_new[i] = malloc (sizeof (float) * periodsize * 2)) == NULL)
-	    {
-		    pf_error(PF_ERR_JACK_BUF_SIZE_CHANGE);
-	        stop();
-	    }
+	 if ((grp_new[i] = malloc (sizeof (float) * periodsize * 2)) == NULL)
+	 {
+              pf_error(PF_ERR_JACK_BUF_SIZE_CHANGE);
+	      stop();
+	 }
 	   
-	    if(grp_buffer[i] != NULL)
-	       free(grp_buffer[i]);
+	 if(grp_buffer[i] != NULL)
+	    free(grp_buffer[i]);
 	    
-	}
+    }
      
     if(grp_buffer != NULL)
-	   free(grp_buffer);
+       free(grp_buffer);
 	       
-	grp_buffer = grp_new; 
+    grp_buffer = grp_new; 
      
     periodsize = b;
 
@@ -371,15 +372,15 @@ static int start(void)
 	
     for(i = 0; i < MAX_JACK_CHANNELS; i++)
     {
-	    snprintf(groupname, 16, "group %i_left", i + 1);
-	    l_grp_port[i] = jack_port_register( client, 
+	 snprintf(groupname, 16, "group %i_left", i + 1);
+	 l_grp_port[i] = jack_port_register( client, 
 		                                    groupname,
 		                                    JACK_DEFAULT_AUDIO_TYPE,
 		                                    JackPortIsOutput,
 		                                    0);
 
-  	    snprintf(groupname, 16, "group %i_right", i + 1);
-	    r_grp_port[i] = jack_port_register( client, 
+  	 snprintf(groupname, 16, "group %i_right", i + 1);
+	 r_grp_port[i] = jack_port_register( client, 
 	                                        groupname,
 		                                    JACK_DEFAULT_AUDIO_TYPE,
 		                                    JackPortIsOutput,
@@ -414,14 +415,14 @@ static int start(void)
     
     for(i = 0; i < MAX_JACK_CHANNELS; i++)
     {
-	    if ((grp_buffer[i] = malloc (sizeof (float) * periodsize * 2)) == NULL)
-	    {
-		    pf_error(PF_ERR_JACK_BUF_ALLOC);
-		    jack_client_close (client);
-	 	    pthread_mutex_unlock (&running_mutex);
-		    return -1;
-	    }
+	if ((grp_buffer[i] = malloc (sizeof (float) * periodsize * 2)) == NULL)
+	{
+             pf_error(PF_ERR_JACK_BUF_ALLOC);
+             jack_client_close (client);
+             pthread_mutex_unlock (&running_mutex);
+             return -1;
 	}
+    }
 
     mixer_flush();
 
@@ -489,10 +490,10 @@ static int stop(void)
             
         for(i = 0; i < MAX_JACK_CHANNELS; i++)
         {
-	        if(grp_buffer[i] != NULL)
-		       free(grp_buffer[i]);
-	    }
-	    free(grp_buffer);
+	    if(grp_buffer[i] != NULL)
+	       free(grp_buffer[i]);
+	}
+	free(grp_buffer);
     }
 
     running = 0;
