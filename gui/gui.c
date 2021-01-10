@@ -100,7 +100,7 @@ static GtkWidget* menu_view_log_display = 0;
 
 /* current patch, makes passing patch id to sample editor easier */
 static int cur_patch = -1;
-
+GtkRecentManager *recent_manager;
 
 GtkWidget* gui_title_new(const char* msg)
 {
